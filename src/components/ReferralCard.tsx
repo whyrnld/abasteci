@@ -4,8 +4,8 @@ import { Users } from "lucide-react";
 
 const ReferralCard = () => {
   return (
-    <Card className="p-4">
-      <div className="flex items-start gap-3 mb-4">
+    <Card className="p-6 bg-gradient-to-r from-white to-gray-50">
+      <div className="flex items-start gap-4 mb-4">
         <Users className="w-6 h-6" />
         <div>
           <h3 className="text-lg font-medium">Indique e Ganhe</h3>

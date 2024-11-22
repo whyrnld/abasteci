@@ -4,8 +4,8 @@ import { Star } from "lucide-react";
 
 const PremiumCard = () => {
   return (
-    <Card className="p-4 bg-gradient-to-r from-black to-gray-800 text-white">
-      <div className="flex items-start gap-3 mb-4">
+    <Card className="p-6 bg-gradient-to-r from-gray-900 to-black text-white">
+      <div className="flex items-start gap-4 mb-4">
         <Star className="w-6 h-6" />
         <div>
           <h3 className="text-lg font-medium">Premium</h3>
