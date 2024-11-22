@@ -25,6 +25,7 @@ const App = () => (
               <Route path="/scanner" element={<Scanner />} />
               <Route path="/history" element={<History />} />
               <Route path="/stations" element={<Stations />} />
+              <Route path="/stations/:id" element={<Stations />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>
             <BottomNav />
