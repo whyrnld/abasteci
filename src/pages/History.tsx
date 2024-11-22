@@ -1,37 +1,51 @@
-import { Card } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ReceiptCard from "@/components/ReceiptCard";
 
 const History = () => {
-  const transactions = [
-    { id: 1, station: "Posto Shell", date: "12/03/2024", amount: 0.10, status: "Aprovado" },
-    { id: 2, station: "Posto Ipiranga", date: "10/03/2024", amount: 0.10, status: "Processando" },
-    { id: 3, station: "Posto BR", date: "08/03/2024", amount: 0.10, status: "Aprovado" },
+  const receipts = [
+    { id: 1, station: "Posto Shell", date: "12/03/2024", amount: 150.00, status: "approved" },
+    { id: 2, station: "Posto Ipiranga", date: "10/03/2024", amount: 200.00, status: "processing" },
+    { id: 3, station: "Posto BR", date: "08/03/2024", amount: 180.00, status: "rejected" },
   ];
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-primary p-6 -mx-6 -mt-6">
-        <h1 className="text-white text-lg font-medium mb-2">Histórico</h1>
+      <section className="bg-black p-6 -mx-6 -mt-6">
+        <h1 className="text-white text-lg font-medium">Notas Fiscais</h1>
       </section>
 
-      <div className="space-y-3">
-        {transactions.map((transaction) => (
-          <Card key={transaction.id} className="p-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">{transaction.station}</p>
-                <p className="text-sm text-gray-500">{transaction.date}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-primary font-medium">
-                  {formatCurrency(transaction.amount)}
-                </p>
-                <p className="text-sm text-gray-500">{transaction.status}</p>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="w-full grid grid-cols-4 h-auto p-1 bg-gray-100">
+          <TabsTrigger value="all" className="text-sm py-2">Todos</TabsTrigger>
+          <TabsTrigger value="processing" className="text-sm py-2">Processando</TabsTrigger>
+          <TabsTrigger value="approved" className="text-sm py-2">Concluídos</TabsTrigger>
+          <TabsTrigger value="rejected" className="text-sm py-2">Recusados</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="mt-4 space-y-3">
+          {receipts.map((receipt) => (
+            <ReceiptCard key={receipt.id} {...receipt} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="processing" className="mt-4 space-y-3">
+          {receipts.filter(r => r.status === "processing").map((receipt) => (
+            <ReceiptCard key={receipt.id} {...receipt} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="approved" className="mt-4 space-y-3">
+          {receipts.filter(r => r.status === "approved").map((receipt) => (
+            <ReceiptCard key={receipt.id} {...receipt} />
+          ))}
+        </TabsContent>
+
+        <TabsContent value="rejected" className="mt-4 space-y-3">
+          {receipts.filter(r => r.status === "rejected").map((receipt) => (
+            <ReceiptCard key={receipt.id} {...receipt} />
+          ))}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

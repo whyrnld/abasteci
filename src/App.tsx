@@ -9,6 +9,8 @@ import Scanner from "./pages/Scanner";
 import History from "./pages/History";
 import Stations from "./pages/Stations";
 import Settings from "./pages/Settings";
+import Balance from "./pages/Balance";
+import ReceiptDetails from "./pages/ReceiptDetails";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
               <Route path="/stations" element={<Stations />} />
               <Route path="/stations/:id" element={<Stations />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/balance" element={<Balance />} />
+              <Route path="/receipts/:id" element={<ReceiptDetails />} />
             </Routes>
             <BottomNav />
           </BrowserRouter>
