@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BottomNav from "./components/BottomNav";
 import Index from "./pages/Index";
+import Scanner from "./pages/Scanner";
+import History from "./pages/History";
+import Stations from "./pages/Stations";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -18,6 +22,10 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/scanner" element={<Scanner />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/stations" element={<Stations />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
             <BottomNav />
           </BrowserRouter>
