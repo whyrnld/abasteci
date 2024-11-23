@@ -18,7 +18,7 @@ const Scanner = () => {
           height: 250,
         },
         fps: 5,
-      });
+      }, false); // Added the missing 'verbose' parameter
 
       scanner.render(success, error);
 
