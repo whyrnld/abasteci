@@ -16,6 +16,15 @@ const WithdrawalRequest = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!pixKey) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Por favor, insira uma chave PIX válida.",
+      });
+      return;
+    }
+    
     toast({
       title: "Solicitação enviada",
       description: "Seu saque será processado em até 24 horas.",
@@ -25,7 +34,7 @@ const WithdrawalRequest = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-black p-6 -mx-6 -mt-6 flex items-center gap-2">
+      <section className="bg-primary p-6 -mx-6 -mt-6 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
           <ArrowLeft className="h-6 w-6" />
         </Button>
