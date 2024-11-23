@@ -15,7 +15,7 @@ const Balance = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-black p-6 -mx-6 -mt-6 flex items-center gap-2">
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6 flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
           <ArrowLeft className="h-6 w-6" />
         </Button>
@@ -28,9 +28,12 @@ const Balance = () => {
             <p className="text-sm text-gray-500">Saldo disponível</p>
             <p className="text-2xl font-bold">{formatCurrency(balance)}</p>
           </div>
-          <Wallet className="w-8 h-8 text-black" />
+          <Wallet className="w-8 h-8 text-primary" />
         </div>
-        <Button className="w-full bg-black hover:bg-gray-800">
+        <Button 
+          className="w-full"
+          onClick={() => navigate('/withdrawal-request')}
+        >
           Solicitar saque
         </Button>
       </Card>

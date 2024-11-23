@@ -37,21 +37,18 @@ const Index = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-black p-6 -mx-6 -mt-6">
-        <div className="flex justify-between items-center mb-2">
-          <h1 className="text-white text-lg font-medium">Olá, João</h1>
-          <Button variant="ghost" size="icon" className="text-white">
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-white text-xl font-medium">Olá, João</h1>
+          <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
             <Bell className="h-6 w-6" />
           </Button>
         </div>
         <BalanceCard balance={balance} pendingBalance={pendingBalance} />
       </section>
 
-      <section>
+      <section className="space-y-4">
         <PremiumCard />
-      </section>
-
-      <section>
         <ReferralCard />
       </section>
 
@@ -64,9 +61,8 @@ const Index = () => {
               to={index === nearbyStations.length - 1 ? "/stations" : `/stations/${station.id}`}
               className="block"
             >
-              <Card className="p-4 hover:shadow-md transition-shadow">
+              <Card className="p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-gray-50 to-white">
                 <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-black" />
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
                       <div>
@@ -74,7 +70,7 @@ const Index = () => {
                         <p className="text-sm text-gray-500">{station.lastUpdate}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-black font-medium">
+                        <p className="text-primary font-medium">
                           {formatCurrency(station.price)}
                         </p>
                         <p className="text-sm text-gray-500">{station.distance}</p>

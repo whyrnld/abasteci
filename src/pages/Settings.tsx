@@ -25,10 +25,12 @@ const Settings = () => {
   const [searchRadius, setSearchRadius] = useState(5);
   const [priceAlerts, setPriceAlerts] = useState(true);
   const [receiptAlerts, setReceiptAlerts] = useState(true);
+  const [defaultPixKey, setDefaultPixKey] = useState("");
+  const [defaultPixKeyType, setDefaultPixKeyType] = useState("cpf");
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-primary p-6 -mx-6 -mt-6">
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6">
         <h1 className="text-white text-lg font-medium">Configurações</h1>
       </section>
 
@@ -42,6 +44,34 @@ const Settings = () => {
             <p className="text-sm text-gray-500">Nome: João Silva</p>
             <p className="text-sm text-gray-500">Email: joao@email.com</p>
             <p className="text-sm text-gray-500">CPF: ***.***.***-**</p>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <h3 className="font-medium mb-4">Chave PIX Padrão</h3>
+          <div className="space-y-4">
+            <div>
+              <Label>Tipo de Chave</Label>
+              <Select value={defaultPixKeyType} onValueChange={setDefaultPixKeyType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cpf">CPF</SelectItem>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="phone">Celular</SelectItem>
+                  <SelectItem value="random">Chave Aleatória</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Chave PIX</Label>
+              <Input
+                value={defaultPixKey}
+                onChange={(e) => setDefaultPixKey(e.target.value)}
+                placeholder="Digite sua chave PIX"
+              />
+            </div>
           </div>
         </Card>
 
@@ -105,24 +135,6 @@ const Settings = () => {
                 onCheckedChange={setReceiptAlerts}
               />
             </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <h3 className="font-medium mb-4">Outros</h3>
-          <div className="space-y-3">
-            <Button variant="ghost" className="w-full justify-start">
-              <Star className="w-5 h-5 mr-2" />
-              Postos favoritos
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <CreditCard className="w-5 h-5 mr-2" />
-              Contas bancárias
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              <Share2 className="w-5 h-5 mr-2" />
-              Indique e ganhe
-            </Button>
           </div>
         </Card>
 
