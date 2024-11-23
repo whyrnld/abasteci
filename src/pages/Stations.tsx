@@ -108,16 +108,18 @@ const Stations = () => {
       </section>
 
       <div className="flex gap-2">
-        <Select value={selectedFuel} onValueChange={setSelectedFuel} className="flex-1">
-          <SelectTrigger>
-            <SelectValue placeholder="Tipo de combustível" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="regular">Gasolina</SelectItem>
-            <SelectItem value="ethanol">Etanol</SelectItem>
-            <SelectItem value="diesel">Diesel</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex-1">
+          <Select value={selectedFuel} onValueChange={setSelectedFuel}>
+            <SelectTrigger>
+              <SelectValue placeholder="Tipo de combustível" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="regular">Gasolina</SelectItem>
+              <SelectItem value="ethanol">Etanol</SelectItem>
+              <SelectItem value="diesel">Diesel</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         <Button variant="outline" onClick={() => setIsFiltersOpen(true)}>
           <Filter className="h-4 w-4" />
