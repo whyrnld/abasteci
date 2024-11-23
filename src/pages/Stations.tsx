@@ -1,13 +1,30 @@
 import { Card } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { MapPin, ArrowLeft, Filter } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Slider } from "@/components/ui/slider";
+import { useState } from "react";
 
 const Stations = () => {
   const { id } = useParams();
   const isDetailView = !!id;
+  const [selectedFuel, setSelectedFuel] = useState("regular");
+  const [sortBy, setSortBy] = useState("price");
+  const [maxDistance, setMaxDistance] = useState(10);
 
   const stations = [
     {
@@ -21,32 +38,46 @@ const Stations = () => {
         ethanol: 3.99,
         diesel: 6.29,
       },
-      priceHistory: [
-        { date: '2024-03-01', regular: 5.39, premium: 6.19, ethanol: 3.89, diesel: 6.19 },
-        { date: '2024-03-15', regular: 5.49, premium: 6.29, ethanol: 3.99, diesel: 6.29 },
-      ],
       lastUpdate: "Há 2 horas",
+    },
+    {
+      id: 2,
+      name: "Posto Ipiranga",
+      distance: "1.8km",
+      address: "Rua Augusta, 500",
+      prices: {
+        regular: 5.39,
+        premium: 6.19,
+        ethanol: 3.89,
+        diesel: 6.19,
+      },
+      lastUpdate: "Há 3 horas",
+    },
+    {
+      id: 3,
+      name: "Posto BR",
+      distance: "2.1km",
+      address: "Av. Rebouças, 800",
+      prices: {
+        regular: 5.45,
+        premium: 6.25,
+        ethanol: 3.95,
+        diesel: 6.25,
+      },
+      lastUpdate: "Há 4 horas",
     },
   ];
 
   const station = stations.find(s => s.id === Number(id));
-
-  const filterOptions = [
-    { label: "7 dias", value: "7" },
-    { label: "15 dias", value: "15" },
-    { label: "30 dias", value: "30" },
-    { label: "60 dias", value: "60" },
-    { label: "90 dias", value: "90" },
-  ];
 
   if (isDetailView && station) {
     return (
       <div className="flex flex-col gap-6 pb-20">
         <section className="bg-primary p-6 -mx-6 -mt-6">
           <div className="flex items-center gap-2 text-white mb-4">
-            <Link to="/stations">
-              <Button variant="ghost" className="text-white hover:text-white/80">
-                Voltar
+            <Link to="/">
+              <Button variant="ghost" className="text-white hover:text-white/80 p-2">
+                <ArrowLeft className="h-6 w-6" />
               </Button>
             </Link>
             <h1 className="text-lg font-medium">{station.name}</h1>
@@ -76,33 +107,6 @@ const Stations = () => {
             ))}
           </div>
         </section>
-
-        <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium">Histórico de Preços</h2>
-            <select className="text-sm border rounded-md p-1">
-              {filterOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Card className="p-4">
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={station.priceHistory}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="regular" stroke="#8884d8" name="Gasolina Comum" />
-                <Line type="monotone" dataKey="premium" stroke="#82ca9d" name="Gasolina Premium" />
-                <Line type="monotone" dataKey="ethanol" stroke="#ffc658" name="Etanol" />
-                <Line type="monotone" dataKey="diesel" stroke="#ff7300" name="Diesel" />
-              </LineChart>
-            </ResponsiveContainer>
-          </Card>
-        </section>
       </div>
     );
   }
@@ -112,6 +116,61 @@ const Stations = () => {
       <section className="bg-primary p-6 -mx-6 -mt-6">
         <h1 className="text-white text-lg font-medium mb-2">Postos Próximos</h1>
       </section>
+
+      <div className="flex gap-2 mt-4">
+        <Select value={selectedFuel} onValueChange={setSelectedFuel}>
+          <SelectTrigger className="bg-white">
+            <SelectValue placeholder="Tipo de combustível" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="regular">Gasolina Comum</SelectItem>
+            <SelectItem value="premium">Gasolina Premium</SelectItem>
+            <SelectItem value="ethanol">Etanol</SelectItem>
+            <SelectItem value="diesel">Diesel</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="bg-white">
+              <Filter className="h-4 w-4 mr-2" />
+              Filtros
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Filtros</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-6 mt-6">
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Ordenar por
+                </label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="price">Preço</SelectItem>
+                    <SelectItem value="distance">Distância</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Distância máxima: {maxDistance}km
+                </label>
+                <Slider
+                  value={[maxDistance]}
+                  onValueChange={([value]) => setMaxDistance(value)}
+                  max={20}
+                  step={1}
+                />
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
 
       <div className="space-y-3">
         {stations.map((station) => (
@@ -128,7 +187,7 @@ const Stations = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-primary font-medium">
-                        R$ {station.prices.regular.toFixed(2)}
+                        R$ {station.prices[selectedFuel as keyof typeof station.prices].toFixed(2)}
                       </p>
                       <p className="text-sm text-gray-500">{station.distance}</p>
                     </div>

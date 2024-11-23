@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { Bell, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,12 @@ const Index = () => {
   return (
     <div className="flex flex-col gap-6 pb-20">
       <section className="bg-black p-6 -mx-6 -mt-6">
-        <h1 className="text-white text-lg font-medium mb-2">Olá, João</h1>
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-white text-lg font-medium">Olá, João</h1>
+          <Button variant="ghost" size="icon" className="text-white">
+            <Bell className="h-6 w-6" />
+          </Button>
+        </div>
         <BalanceCard balance={balance} pendingBalance={pendingBalance} />
       </section>
 
