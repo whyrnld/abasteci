@@ -25,11 +25,11 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#9b87f5",
+          DEFAULT: "#34D399", // Verde esmeralda vibrante
           foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "#7E69AB",
+          DEFAULT: "#10B981", // Verde mais escuro e sofisticado
           foreground: "#ffffff",
         },
         destructive: {
@@ -41,8 +41,8 @@ export default {
           foreground: "#6b7280",
         },
         accent: {
-          DEFAULT: "#e5deff",
-          foreground: "#1a1f2c",
+          DEFAULT: "#ECFDF5", // Verde suave para destaque
+          foreground: "#065F46",
         },
         card: {
           DEFAULT: "#ffffff",
