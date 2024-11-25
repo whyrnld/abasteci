@@ -36,7 +36,7 @@ const App = () => (
               <Route path="/receipts/:id" element={<ReceiptDetails />} />
               <Route path="/premium" element={<Premium />} />
               <Route path="/referral" element={<Referral />} />
-              <Route path="/withdrawal" element={<WithdrawalRequest />} />
+              <Route path="/withdrawal-request" element={<WithdrawalRequest />} />
             </Routes>
             <BottomNav />
           </BrowserRouter>

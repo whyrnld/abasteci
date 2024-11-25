@@ -1,8 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PremiumCard = () => {
+  const navigate = useNavigate();
+
   return (
     <Card className="p-6 bg-gradient-to-r from-gray-900 to-black text-white">
       <div className="flex items-start gap-4 mb-4">
@@ -16,7 +19,11 @@ const PremiumCard = () => {
         <li>• Envie mais notas fiscais</li>
         <li>• Sem valor mínimo para resgate</li>
       </ul>
-      <Button variant="secondary" className="w-full">
+      <Button 
+        variant="secondary" 
+        className="w-full"
+        onClick={() => navigate('/premium')}
+      >
         Assinar Premium
       </Button>
     </Card>

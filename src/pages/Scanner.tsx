@@ -1,12 +1,21 @@
 import { QrCode, KeyRound } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const Scanner = () => {
   const [showScanner, setShowScanner] = useState(false);
+  const [manualKey, setManualKey] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -47,6 +56,23 @@ const Scanner = () => {
     };
   }, [showScanner, toast]);
 
+  const handleManualKeySubmit = () => {
+    if (!manualKey) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Por favor, insira uma chave válida.",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Chave registrada com sucesso!",
+      description: "O cupom fiscal foi registrado.",
+    });
+    setManualKey("");
+  };
+
   return (
     <div className="flex flex-col gap-6 pb-20">
       <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6">
@@ -62,10 +88,32 @@ const Scanner = () => {
               <Button className="w-full" onClick={() => setShowScanner(true)}>
                 Ler QR Code
               </Button>
-              <Button variant="outline" className="w-full">
-                <KeyRound className="w-4 h-4 mr-2" />
-                Digitar chave
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="w-full">
+                    <KeyRound className="w-4 h-4 mr-2" />
+                    Digitar chave
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Digite a chave do cupom fiscal</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <Input
+                      placeholder="Digite a chave aqui"
+                      value={manualKey}
+                      onChange={(e) => setManualKey(e.target.value)}
+                    />
+                    <Button 
+                      className="w-full" 
+                      onClick={handleManualKeySubmit}
+                    >
+                      Enviar
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </Card>
 
