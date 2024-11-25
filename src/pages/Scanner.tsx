@@ -1,9 +1,8 @@
 import { QrCode, KeyRound } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import { useToast } from "@/components/ui/use-toast";
 
 const Scanner = () => {
@@ -11,34 +10,41 @@ const Scanner = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    let html5QrCode: Html5Qrcode;
+
     if (showScanner) {
-      const scanner = new Html5QrcodeScanner("reader", {
-        qrbox: {
-          width: 250,
-          height: 250,
-        },
-        fps: 5,
-      }, false); // Added the missing 'verbose' parameter
-
-      scanner.render(success, error);
-
-      function success(result: string) {
-        scanner.clear();
-        setShowScanner(false);
-        toast({
-          title: "QR Code lido com sucesso!",
-          description: "O cupom fiscal foi registrado.",
+      html5QrCode = new Html5Qrcode("reader");
+      html5QrCode
+        .start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+          },
+          (decodedText) => {
+            html5QrCode.stop();
+            setShowScanner(false);
+            toast({
+              title: "QR Code lido com sucesso!",
+              description: "O cupom fiscal foi registrado.",
+            });
+          },
+          (error) => {
+            console.error(error);
+          }
+        )
+        .catch((err) => {
+          console.error(err);
         });
-      }
-
-      function error(err: any) {
-        console.warn(err);
-      }
-
-      return () => {
-        scanner.clear();
-      };
     }
+
+    return () => {
+      if (html5QrCode) {
+        html5QrCode
+          .stop()
+          .catch((err) => console.error("Error stopping QR Code scanner:", err));
+      }
+    };
   }, [showScanner, toast]);
 
   return (
@@ -53,17 +59,10 @@ const Scanner = () => {
             <QrCode className="w-16 h-16 text-primary mx-auto" />
             <p className="text-gray-600">Escolha uma das opções abaixo</p>
             <div className="space-y-3">
-              <Button 
-                className="w-full" 
-                onClick={() => setShowScanner(true)}
-              >
+              <Button className="w-full" onClick={() => setShowScanner(true)}>
                 Ler QR Code
               </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => {/* Implement manual key input */}}
-              >
+              <Button variant="outline" className="w-full">
                 <KeyRound className="w-4 h-4 mr-2" />
                 Digitar chave
               </Button>

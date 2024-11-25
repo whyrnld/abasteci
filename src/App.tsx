@@ -11,6 +11,9 @@ import Stations from "./pages/Stations";
 import Settings from "./pages/Settings";
 import Balance from "./pages/Balance";
 import ReceiptDetails from "./pages/ReceiptDetails";
+import Premium from "./pages/Premium";
+import Referral from "./pages/Referral";
+import WithdrawalRequest from "./pages/WithdrawalRequest";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +34,9 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/balance" element={<Balance />} />
               <Route path="/receipts/:id" element={<ReceiptDetails />} />
+              <Route path="/premium" element={<Premium />} />
+              <Route path="/referral" element={<Referral />} />
+              <Route path="/withdrawal" element={<WithdrawalRequest />} />
             </Routes>
             <BottomNav />
           </BrowserRouter>

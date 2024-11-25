@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,7 +10,6 @@ import { useToast } from "@/components/ui/use-toast";
 const WithdrawalRequest = () => {
   const [pixKeyType, setPixKeyType] = useState("cpf");
   const [pixKey, setPixKey] = useState("");
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -29,14 +27,13 @@ const WithdrawalRequest = () => {
       title: "Solicitação enviada",
       description: "Seu saque será processado em até 24 horas.",
     });
-    navigate("/balance");
   };
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-primary p-6 -mx-6 -mt-6 flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
-          <ArrowLeft className="h-6 w-6" />
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6 flex items-center gap-2">
+        <Button variant="ghost" onClick={() => window.history.back()} className="text-white p-2">
+          ←
         </Button>
         <h1 className="text-white text-lg font-medium">Solicitar Saque</h1>
       </section>

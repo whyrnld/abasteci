@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 interface StationCardProps {
   station: {
@@ -20,16 +19,12 @@ interface StationCardProps {
 }
 
 export const StationCard = ({ station, selectedFuel }: StationCardProps) => {
-  const handleCreateRoute = (e: React.MouseEvent) => {
-    e.preventDefault();
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(station.address)}`);
-  };
-
   const getLogo = (name: string) => {
-    if (name.toLowerCase().includes('shell')) return '/logos/shell.png';
-    if (name.toLowerCase().includes('ipiranga')) return '/logos/ipiranga.png';
-    if (name.toLowerCase().includes('br')) return '/logos/petrobras.png';
-    return '/logos/default.png';
+    const baseUrl = "https://images.unsplash.com/";
+    if (name.toLowerCase().includes('shell')) return `${baseUrl}photo-1487058792275-0ad4aaf24ca7`;
+    if (name.toLowerCase().includes('ipiranga')) return `${baseUrl}photo-1485827404703-89b55fcc595e`;
+    if (name.toLowerCase().includes('br')) return `${baseUrl}photo-1486312338219-ce68d2c6f44d`;
+    return `${baseUrl}photo-1483058712412-4245e9b90334`;
   };
 
   return (
@@ -39,31 +34,18 @@ export const StationCard = ({ station, selectedFuel }: StationCardProps) => {
           <img 
             src={getLogo(station.name)} 
             alt={station.name} 
-            className="w-10 h-10 object-contain"
+            className="w-10 h-10 object-cover rounded-full"
           />
-          <div className="flex-1 space-y-2">
-            <div>
-              <div className="flex justify-between items-start">
-                <p className="font-medium">{station.name}</p>
-                <p className="text-sm text-gray-500">{station.distance}</p>
-              </div>
-              <p className="text-sm text-gray-500">{station.address}</p>
+          <div className="flex-1">
+            <div className="flex justify-between items-start">
+              <p className="font-medium">{station.name}</p>
+              <p className="text-sm text-gray-500">{station.distance}</p>
             </div>
-            
-            <p className="text-primary font-medium">
+            <p className="text-sm text-gray-500 mt-1">{station.address}</p>
+            <p className="text-primary font-medium mt-2">
               Comum: R$ {station.prices.regular.toFixed(2)} • Aditivada: R$ {station.prices.premium.toFixed(2)}
             </p>
-            
-            <div className="flex justify-between items-center">
-              <p className="text-xs text-gray-400">{station.lastUpdate}</p>
-              <Button 
-                variant="secondary" 
-                size="sm"
-                onClick={handleCreateRoute}
-              >
-                Criar Rota
-              </Button>
-            </div>
+            <p className="text-xs text-gray-400 mt-2">{station.lastUpdate}</p>
           </div>
         </div>
       </Card>

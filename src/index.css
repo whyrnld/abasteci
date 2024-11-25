@@ -34,4 +34,8 @@
     @apply bg-background text-foreground antialiased;
     -webkit-tap-highlight-color: transparent;
   }
+
+  select, .select {
+    @apply bg-white;
+  }
 }
