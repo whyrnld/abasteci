@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Filter } from "lucide-react";
+import { Filter, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StationCard } from "@/components/stations/StationCard";
@@ -63,16 +63,18 @@ const Stations = () => {
     return (
       <div className="flex flex-col gap-6 pb-20">
         <section className="bg-primary p-6 -mx-6 -mt-6">
-          <Link to="/stations">
-            <Button variant="ghost" className="text-white hover:text-white/80 p-2">
-              ←
-            </Button>
-          </Link>
-          <h1 className="text-white text-lg font-medium mt-2">{station.name}</h1>
+          <div className="flex items-center gap-2">
+            <Link to="/stations">
+              <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
+                <ArrowLeft className="h-6 w-6" />
+              </Button>
+            </Link>
+            <h1 className="text-white text-lg font-medium">{station.name}</h1>
+          </div>
         </section>
 
         <Select value={selectedFuel} onValueChange={setSelectedFuel}>
-          <SelectTrigger>
+          <SelectTrigger className="bg-white">
             <SelectValue placeholder="Tipo de combustível" />
           </SelectTrigger>
           <SelectContent>
@@ -85,13 +87,16 @@ const Stations = () => {
         <PriceHistory stationId={station.id} selectedFuel={selectedFuel} />
 
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Preços Atuais</h2>
+          <div>
+            <h2 className="text-lg font-medium">Preços Atuais</h2>
+            <p className="text-sm text-gray-500">Atualizado em {station.lastUpdate}</p>
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 border rounded-lg">
+            <div className="p-4 border rounded-lg bg-white">
               <p className="text-sm text-gray-500">Comum</p>
               <p className="text-lg font-medium">R$ {station.prices.regular.toFixed(2)}</p>
             </div>
-            <div className="p-4 border rounded-lg">
+            <div className="p-4 border rounded-lg bg-white">
               <p className="text-sm text-gray-500">Aditivada</p>
               <p className="text-lg font-medium">R$ {station.prices.premium.toFixed(2)}</p>
             </div>
@@ -110,7 +115,7 @@ const Stations = () => {
       <div className="flex gap-2">
         <div className="flex-1">
           <Select value={selectedFuel} onValueChange={setSelectedFuel}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue placeholder="Tipo de combustível" />
             </SelectTrigger>
             <SelectContent>
@@ -121,7 +126,7 @@ const Stations = () => {
           </Select>
         </div>
 
-        <Button variant="outline" onClick={() => setIsFiltersOpen(true)}>
+        <Button variant="outline" onClick={() => setIsFiltersOpen(true)} className="bg-white">
           <Filter className="h-4 w-4" />
         </Button>
       </div>

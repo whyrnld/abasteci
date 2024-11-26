@@ -42,9 +42,14 @@ export const StationCard = ({ station, selectedFuel }: StationCardProps) => {
               <p className="text-sm text-gray-500">{station.distance}</p>
             </div>
             <p className="text-sm text-gray-500 mt-1">{station.address}</p>
-            <p className="text-primary font-medium mt-2">
-              Comum: R$ {station.prices.regular.toFixed(2)} • Aditivada: R$ {station.prices.premium.toFixed(2)}
-            </p>
+            <div className="flex justify-between items-center mt-2">
+              <p className="text-primary font-medium">
+                Comum: R$ {station.prices.regular.toFixed(2)}
+              </p>
+              <p className="text-primary font-medium">
+                Aditivada: R$ {station.prices.premium.toFixed(2)}
+              </p>
+            </div>
             <p className="text-xs text-gray-400 mt-2">{station.lastUpdate}</p>
           </div>
         </div>

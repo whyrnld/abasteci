@@ -21,7 +21,7 @@ export const PriceHistory = ({ stationId, selectedFuel }: PriceHistoryProps) => 
     <Card className="p-4">
       <div className="space-y-4">
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {[7, 15, 30, 60, 90].map((days) => (
+          {[7, 15, 30].map((days) => (
             <Button
               key={days}
               variant={period === days ? "default" : "outline"}
