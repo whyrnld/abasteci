@@ -15,6 +15,7 @@ import ReceiptDetails from "./pages/ReceiptDetails";
 import Premium from "./pages/Premium";
 import Referral from "./pages/Referral";
 import WithdrawalRequest from "./pages/WithdrawalRequest";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
                 <Route path="/premium" element={<Premium />} />
                 <Route path="/referral" element={<Referral />} />
                 <Route path="/withdrawal-request" element={<WithdrawalRequest />} />
+                <Route path="/notifications" element={<Notifications />} />
               </Routes>
               <BottomNav />
             </BrowserRouter>

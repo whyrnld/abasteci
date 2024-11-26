@@ -62,7 +62,7 @@ const Stations = () => {
   if (id && station) {
     return (
       <div className="flex flex-col gap-6 pb-20">
-        <section className="bg-primary p-6 -mx-6 -mt-6">
+        <section className="bg-primary p-6 pt-8 -mx-6 -mt-6">
           <div className="flex items-center gap-2">
             <Link to="/stations">
               <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
@@ -108,7 +108,7 @@ const Stations = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-primary p-6 -mx-6 -mt-6">
+      <section className="bg-primary p-6 pt-8 -mx-6 -mt-6">
         <h1 className="text-white text-lg font-medium">Postos Próximos</h1>
       </section>
 
@@ -133,7 +133,7 @@ const Stations = () => {
 
       <PriceStats stations={stations} selectedFuel={selectedFuel} />
 
-      <div className="space-y-3">
+      <div className="space-y-6">
         {stations.map((station) => (
           <StationCard
             key={station.id}

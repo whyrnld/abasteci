@@ -18,6 +18,7 @@ const PremiumCard = () => {
       <ul className="text-sm space-y-2 mb-4 opacity-90">
         <li>• Envie mais notas fiscais</li>
         <li>• Sem valor mínimo para resgate</li>
+        <li>• Sem anúncios</li>
       </ul>
       <Button 
         variant="secondary" 

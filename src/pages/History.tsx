@@ -10,8 +10,8 @@ const History = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-gradient-to-r from-black to-gray-900 p-6 -mx-6">
-        <h1 className="text-white text-lg font-medium mt-4">Notas Fiscais</h1>
+      <section className="bg-gradient-to-r from-black to-gray-900 p-6 pt-8 -mx-6">
+        <h1 className="text-white text-lg font-medium">Notas Fiscais</h1>
       </section>
 
       <Tabs defaultValue="all" className="w-full mt-4">
@@ -22,7 +22,7 @@ const History = () => {
           <TabsTrigger value="rejected" className="text-sm py-2">Recusados</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="mt-6 space-y-4">
+        <TabsContent value="all" className="mt-6 space-y-6">
           {receipts.map((receipt) => (
             <ReceiptCard key={receipt.id} {...receipt} />
           ))}

@@ -37,12 +37,14 @@ const Index = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6">
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-white text-xl font-medium">Olá, João</h1>
-          <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
-            <Bell className="h-6 w-6" />
-          </Button>
+          <Link to="/notifications">
+            <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
+              <Bell className="h-6 w-6" />
+            </Button>
+          </Link>
         </div>
         <BalanceCard balance={balance} pendingBalance={pendingBalance} />
       </section>
