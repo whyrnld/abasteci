@@ -13,6 +13,8 @@ interface Station {
     ethanol: number;
     diesel: number;
   };
+  distance?: string;
+  lastUpdate?: string;
 }
 
 export const useStations = () => {
@@ -21,10 +23,26 @@ export const useStations = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('stations')
-        .select('*, prices(*)');
+        .select(`
+          *,
+          prices (
+            regular,
+            premium,
+            ethanol,
+            diesel,
+            updated_at
+          )
+        `)
+        .order('name');
 
       if (error) throw error;
-      return data as Station[];
+
+      return data.map((station: any) => ({
+        ...station,
+        prices: station.prices[0],
+        lastUpdate: new Date(station.prices[0].updated_at).toLocaleString(),
+        distance: '1.2km', // TODO: Calculate real distance
+      })) as Station[];
     },
   });
 

@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      prices: {
+        Row: {
+          created_at: string
+          diesel: number
+          ethanol: number
+          id: number
+          premium: number
+          regular: number
+          station_id: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          diesel: number
+          ethanol: number
+          id?: number
+          premium: number
+          regular: number
+          station_id?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          diesel?: number
+          ethanol?: number
+          id?: number
+          premium?: number
+          regular?: number
+          station_id?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prices_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stations: {
         Row: {
           address: string
