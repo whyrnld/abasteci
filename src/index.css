@@ -35,7 +35,7 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  select, .select {
+  select, .select, [data-radix-select-content] {
     @apply bg-white;
   }
 }
