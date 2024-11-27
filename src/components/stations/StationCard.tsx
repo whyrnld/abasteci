@@ -1,20 +1,9 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import type { Station } from "@/hooks/useStations";
 
 interface StationCardProps {
-  station: {
-    id: number;
-    name: string;
-    distance: string;
-    address: string;
-    prices: {
-      regular: number;
-      premium: number;
-      ethanol: number;
-      diesel: number;
-    };
-    lastUpdate: string;
-  };
+  station: Station;
   selectedFuel: string;
 }
 

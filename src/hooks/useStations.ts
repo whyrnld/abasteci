@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 
-interface Station {
+export interface Station {
   id: number;
   name: string;
   address: string;
@@ -12,9 +12,10 @@ interface Station {
     premium: number;
     ethanol: number;
     diesel: number;
+    updated_at: string;
   };
-  distance?: string;
-  lastUpdate?: string;
+  distance: string;
+  lastUpdate: string;
 }
 
 export const useStations = () => {
@@ -23,23 +24,19 @@ export const useStations = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('stations')
-        .select(`
-          *,
-          prices (
-            regular,
-            premium,
-            ethanol,
-            diesel,
-            updated_at
-          )
-        `)
+        .select('*, prices!inner(regular, premium, ethanol, diesel, updated_at)')
         .order('name');
 
       if (error) throw error;
 
       return data.map((station: any) => ({
         ...station,
-        prices: station.prices[0],
+        prices: {
+          regular: station.prices[0].regular,
+          premium: station.prices[0].premium,
+          ethanol: station.prices[0].ethanol,
+          diesel: station.prices[0].diesel,
+        },
         lastUpdate: new Date(station.prices[0].updated_at).toLocaleString(),
         distance: '1.2km', // TODO: Calculate real distance
       })) as Station[];

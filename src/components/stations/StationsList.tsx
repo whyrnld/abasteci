@@ -1,19 +1,6 @@
 import { StationCard } from "./StationCard";
 import { PriceStats } from "./PriceStats";
-
-interface Station {
-  id: number;
-  name: string;
-  distance: string;
-  address: string;
-  prices: {
-    regular: number;
-    premium: number;
-    ethanol: number;
-    diesel: number;
-  };
-  lastUpdate: string;
-}
+import type { Station } from "@/hooks/useStations";
 
 interface StationsListProps {
   stations: Station[];
