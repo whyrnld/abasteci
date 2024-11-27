@@ -32,7 +32,7 @@ const Settings = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6">
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
         <h1 className="text-white text-lg font-medium">Configurações</h1>
       </section>
 

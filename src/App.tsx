@@ -16,6 +16,7 @@ import Premium from "./pages/Premium";
 import Referral from "./pages/Referral";
 import WithdrawalRequest from "./pages/WithdrawalRequest";
 import Notifications from "./pages/Notifications";
+import NotificationDetails from "./pages/NotificationDetails";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/referral" element={<Referral />} />
                 <Route path="/withdrawal-request" element={<WithdrawalRequest />} />
                 <Route path="/notifications" element={<Notifications />} />
+                <Route path="/notifications/:id" element={<NotificationDetails />} />
               </Routes>
               <BottomNav />
             </BrowserRouter>

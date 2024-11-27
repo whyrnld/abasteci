@@ -25,8 +25,8 @@ const ReceiptDetails = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-black p-6 -mx-6 -mt-6 flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6 flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white hover:text-white/80">
           <ArrowLeft className="h-6 w-6" />
         </Button>
         <h1 className="text-white text-lg font-medium">Detalhes da Nota</h1>

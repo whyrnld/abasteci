@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Notifications = () => {
   const navigate = useNavigate();
@@ -42,14 +42,15 @@ const Notifications = () => {
 
       <div className="space-y-4">
         {notifications.map((notification) => (
-          <Card 
-            key={notification.id} 
-            className={`p-4 ${!notification.read ? 'bg-primary/5' : ''}`}
-          >
-            <h3 className="font-medium">{notification.title}</h3>
-            <p className="text-sm text-gray-500 mt-1">{notification.message}</p>
-            <p className="text-xs text-gray-400 mt-2">{notification.date}</p>
-          </Card>
+          <Link to={`/notifications/${notification.id}`} key={notification.id}>
+            <Card 
+              className={`p-4 hover:shadow-md transition-shadow ${!notification.read ? 'bg-primary/5' : ''}`}
+            >
+              <h3 className="font-medium">{notification.title}</h3>
+              <p className="text-sm text-gray-500 mt-1">{notification.message}</p>
+              <p className="text-xs text-gray-400 mt-2">{notification.date}</p>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

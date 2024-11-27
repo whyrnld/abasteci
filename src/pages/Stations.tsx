@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Filter, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,8 @@ const Stations = () => {
         diesel: 6.29,
       },
       lastUpdate: "Há 2 horas",
+      latitude: -23.5629,
+      longitude: -46.6544,
     },
     {
       id: 2,
@@ -41,6 +43,8 @@ const Stations = () => {
         diesel: 6.19,
       },
       lastUpdate: "Há 3 horas",
+      latitude: -23.5589,
+      longitude: -46.6535,
     },
     {
       id: 3,
@@ -54,15 +58,68 @@ const Stations = () => {
         diesel: 6.25,
       },
       lastUpdate: "Há 4 horas",
+      latitude: -23.5647,
+      longitude: -46.6698,
     },
   ];
 
   const station = stations.find(s => s.id === Number(id));
 
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [nearestStation, setNearestStation] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userLocation && stations) {
+      const nearest = stations.reduce((prev, curr) => {
+        const prevDistance = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          prev.latitude,
+          prev.longitude
+        );
+        const currDistance = calculateDistance(
+          userLocation.latitude,
+          userLocation.longitude,
+          curr.latitude,
+          curr.longitude
+        );
+        return prevDistance < currDistance ? prev : curr;
+      });
+      setNearestStation(nearest.id);
+    }
+  }, [userLocation, stations]);
+
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
   if (id && station) {
     return (
       <div className="flex flex-col gap-6 pb-20">
-        <section className="bg-primary p-6 pt-8 -mx-6 -mt-6">
+        <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
           <div className="flex items-center gap-2">
             <Link to="/stations">
               <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
@@ -108,7 +165,7 @@ const Stations = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-primary p-6 pt-8 -mx-6 -mt-6">
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
         <h1 className="text-white text-lg font-medium">Postos Próximos</h1>
       </section>
 
@@ -135,11 +192,12 @@ const Stations = () => {
 
       <div className="space-y-6">
         {stations.map((station) => (
-          <StationCard
-            key={station.id}
-            station={station}
-            selectedFuel={selectedFuel}
-          />
+          <div key={station.id} className={`${station.id === nearestStation ? 'ring-2 ring-primary' : ''}`}>
+            <StationCard
+              station={station}
+              selectedFuel={selectedFuel}
+            />
+          </div>
         ))}
       </div>
 
