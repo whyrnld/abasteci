@@ -7,6 +7,8 @@ export interface Station {
   address: string;
   latitude: number;
   longitude: number;
+  cnpj: string | null;
+  image_url: string | null;
   prices: {
     regular: number;
     premium: number;

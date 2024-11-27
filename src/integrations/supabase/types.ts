@@ -53,24 +53,30 @@ export type Database = {
       stations: {
         Row: {
           address: string
+          cnpj: string | null
           created_at: string
           id: number
+          image_url: string | null
           latitude: number
           longitude: number
           name: string
         }
         Insert: {
           address: string
+          cnpj?: string | null
           created_at?: string
           id?: number
+          image_url?: string | null
           latitude: number
           longitude: number
           name: string
         }
         Update: {
           address?: string
+          cnpj?: string | null
           created_at?: string
           id?: number
+          image_url?: string | null
           latitude?: number
           longitude?: number
           name?: string
