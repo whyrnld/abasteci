@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
