@@ -9,7 +9,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 
 const Stations = () => {
   const [selectedFuel, setSelectedFuel] = useState("regular");
-  const [sortBy, setSortBy] = useState("price");
+  const [sortBy, setSortBy] = useState("distance");
   const [maxDistance, setMaxDistance] = useState(10);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const { id } = useParams();
@@ -17,10 +17,18 @@ const Stations = () => {
   
   const { stations, isLoading } = useStations();
 
-  // Filter stations based on maxDistance
-  const filteredStations = stations?.filter(station => {
+  // Filter and sort stations
+  const processedStations = stations?.filter(station => {
     if (!station.calculatedDistance) return true;
     return station.calculatedDistance <= maxDistance;
+  }).sort((a, b) => {
+    if (sortBy === "distance") {
+      if (!a.calculatedDistance || !b.calculatedDistance) return 0;
+      return a.calculatedDistance - b.calculatedDistance;
+    } else {
+      // Sort by price
+      return a.prices[selectedFuel as keyof typeof a.prices] - b.prices[selectedFuel as keyof typeof b.prices];
+    }
   });
 
   const calculateDrivingTime = (distanceKm: number) => {
@@ -41,7 +49,7 @@ const Stations = () => {
         <div className="flex flex-col min-h-screen bg-gray-50">
           {/* Header */}
           <div className="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
-            <div className="flex items-center gap-3 p-4">
+            <div className="flex items-center gap-3 p-4 max-w-md mx-auto">
               <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
                 <ArrowLeft className="h-5 w-5" />
               </Button>
@@ -50,7 +58,7 @@ const Stations = () => {
           </div>
 
           {/* Content */}
-          <div className="flex flex-col gap-4 p-4 mt-16">
+          <div className="flex flex-col gap-4 p-4 mt-16 max-w-md mx-auto">
             <div className="flex gap-4 items-start">
               <img 
                 src={station.image_url || 'https://images.unsplash.com/photo-1483058712412-4245e9b90334'} 
@@ -66,20 +74,20 @@ const Stations = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-gray-100 rounded-lg">
-                <p className="text-sm text-gray-500">Comum</p>
+              <div className="p-4 bg-gray-200 rounded-lg">
+                <p className="text-sm text-gray-600">Comum</p>
                 <p className="text-xl font-bold text-primary">R$ {station.prices.regular.toFixed(2)}</p>
               </div>
-              <div className="p-4 bg-gray-100 rounded-lg">
-                <p className="text-sm text-gray-500">Aditivada</p>
+              <div className="p-4 bg-gray-200 rounded-lg">
+                <p className="text-sm text-gray-600">Aditivada</p>
                 <p className="text-xl font-bold text-primary">R$ {station.prices.premium.toFixed(2)}</p>
               </div>
-              <div className="p-4 bg-gray-100 rounded-lg">
-                <p className="text-sm text-gray-500">Etanol</p>
+              <div className="p-4 bg-gray-200 rounded-lg">
+                <p className="text-sm text-gray-600">Etanol</p>
                 <p className="text-xl font-bold text-primary">R$ {station.prices.ethanol.toFixed(2)}</p>
               </div>
-              <div className="p-4 bg-gray-100 rounded-lg">
-                <p className="text-sm text-gray-500">Diesel</p>
+              <div className="p-4 bg-gray-200 rounded-lg">
+                <p className="text-sm text-gray-600">Diesel</p>
                 <p className="text-xl font-bold text-primary">R$ {station.prices.diesel.toFixed(2)}</p>
               </div>
             </div>
@@ -96,7 +104,7 @@ const Stations = () => {
                 height="100%"
                 frameBorder="0"
                 style={{ border: 0 }}
-                src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${station.latitude},${station.longitude}`}
+                src={`https://www.google.com/maps/embed/v1/place?key=_3czri_x4JO1qGZ6LJCfO1-ZTHI=&q=${station.latitude},${station.longitude}`}
                 allowFullScreen
               />
             </div>
@@ -122,7 +130,7 @@ const Stations = () => {
   return (
     <div className="flex flex-col gap-6 pb-20">
       <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
-        <h1 className="text-white text-lg font-medium">Postos Próximos</h1>
+        <h1 className="text-white text-lg font-medium">Postos</h1>
       </section>
 
       <div className="flex gap-2">
@@ -145,7 +153,7 @@ const Stations = () => {
       </div>
 
       <StationsList 
-        stations={filteredStations || []} 
+        stations={processedStations || []} 
         selectedFuel={selectedFuel}
         isLoading={isLoading}
       />

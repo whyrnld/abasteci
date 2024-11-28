@@ -33,21 +33,11 @@ const Index = () => {
     }
   }, []);
 
-  const calculateDistance = (stationLat: number, stationLng: number) => {
-    if (!userLocation) return "-- km";
-    
-    const R = 6371; // Earth's radius in km
-    const dLat = (stationLat - userLocation.lat) * Math.PI / 180;
-    const dLon = (stationLng - userLocation.lng) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(userLocation.lat * Math.PI / 180) * Math.cos(stationLat * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const distance = R * c;
-    
-    return `${distance.toFixed(1)}km`;
-  };
+  // Sort stations by distance
+  const sortedStations = stations?.slice().sort((a, b) => {
+    if (!a.calculatedDistance || !b.calculatedDistance) return 0;
+    return a.calculatedDistance - b.calculatedDistance;
+  }).slice(0, 5); // Only show first 5 stations
 
   return (
     <div className="flex flex-col gap-6 pb-20">
@@ -80,7 +70,7 @@ const Index = () => {
 
       <section>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium">Postos mais próximos</h2>
+          <h2 className="text-lg font-medium">Postos</h2>
           <Select value={selectedFuel} onValueChange={setSelectedFuel}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />
@@ -92,7 +82,7 @@ const Index = () => {
           </Select>
         </div>
         <div className="space-y-3">
-          {stations?.map((station, index) => (
+          {sortedStations?.map((station) => (
             <Link 
               key={station.id} 
               to={`/stations/${station.id}`}
@@ -119,7 +109,7 @@ const Index = () => {
                           }
                         </p>
                         <p className="text-sm text-gray-500">
-                          {calculateDistance(station.latitude, station.longitude)}
+                          {station.calculatedDistance ? `${station.calculatedDistance.toFixed(1)}km` : '--'}
                         </p>
                       </div>
                     </div>
