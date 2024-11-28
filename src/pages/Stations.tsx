@@ -28,10 +28,9 @@ const Stations = () => {
       return distanceA - distanceB;
     } else {
       // Sort by price
-      return (
-        a.prices[selectedFuel as keyof typeof a.prices] - 
-        b.prices[selectedFuel as keyof typeof b.prices]
-      );
+      const priceA = Number(a.prices[selectedFuel as keyof typeof a.prices]) || 0;
+      const priceB = Number(b.prices[selectedFuel as keyof typeof b.prices]) || 0;
+      return priceA - priceB;
     }
   });
 
