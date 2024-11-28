@@ -19,16 +19,19 @@ const Stations = () => {
 
   // Filter and sort stations
   const processedStations = stations?.filter(station => {
-    const distance = station.calculatedDistance || 0;
+    const distance = typeof station.calculatedDistance === 'number' ? station.calculatedDistance : 0;
     return distance <= maxDistance;
   }).sort((a, b) => {
     if (sortBy === "distance") {
-      const distanceA = a.calculatedDistance || 0;
-      const distanceB = b.calculatedDistance || 0;
+      const distanceA = typeof a.calculatedDistance === 'number' ? a.calculatedDistance : 0;
+      const distanceB = typeof b.calculatedDistance === 'number' ? b.calculatedDistance : 0;
       return distanceA - distanceB;
     } else {
       // Sort by price
-      return a.prices[selectedFuel as keyof typeof a.prices] - b.prices[selectedFuel as keyof typeof b.prices];
+      return (
+        a.prices[selectedFuel as keyof typeof a.prices] - 
+        b.prices[selectedFuel as keyof typeof b.prices]
+      );
     }
   });
 
