@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReceiptCard from "@/components/ReceiptCard";
+import { Check, Clock, X } from "lucide-react";
 
 const History = () => {
   const receipts = [
@@ -7,6 +8,12 @@ const History = () => {
     { id: 2, station: "Posto Ipiranga", date: "10/03/2024", amount: 200.00, status: "processing" as const },
     { id: 3, station: "Posto BR", date: "08/03/2024", amount: 180.00, status: "rejected" as const },
   ];
+
+  const statusIcons = {
+    approved: <Check className="w-5 h-5 text-green-500" />,
+    processing: <Clock className="w-5 h-5 text-yellow-500" />,
+    rejected: <X className="w-5 h-5 text-red-500" />
+  };
 
   return (
     <div className="flex flex-col gap-6 pb-20">
@@ -22,25 +29,25 @@ const History = () => {
           <TabsTrigger value="rejected" className="text-sm py-2">Recusados</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="mt-6 space-y-4">
+        <TabsContent value="all" className="mt-6 space-y-3">
           {receipts.map((receipt) => (
             <ReceiptCard key={receipt.id} {...receipt} />
           ))}
         </TabsContent>
 
-        <TabsContent value="approved" className="mt-6 space-y-4">
+        <TabsContent value="approved" className="mt-6 space-y-3">
           {receipts.filter(r => r.status === "approved").map((receipt) => (
             <ReceiptCard key={receipt.id} {...receipt} />
           ))}
         </TabsContent>
 
-        <TabsContent value="completed" className="mt-6 space-y-4">
+        <TabsContent value="completed" className="mt-6 space-y-3">
           {receipts.filter(r => r.status === "approved").map((receipt) => (
             <ReceiptCard key={receipt.id} {...receipt} />
           ))}
         </TabsContent>
 
-        <TabsContent value="rejected" className="mt-6 space-y-4">
+        <TabsContent value="rejected" className="mt-6 space-y-3">
           {receipts.filter(r => r.status === "rejected").map((receipt) => (
             <ReceiptCard key={receipt.id} {...receipt} />
           ))}

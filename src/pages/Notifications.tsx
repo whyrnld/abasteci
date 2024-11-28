@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate, Link } from "react-router-dom";
@@ -24,6 +24,8 @@ const Notifications = () => {
     },
   ];
 
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return (
     <div className="flex flex-col gap-6 pb-20">
       <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
@@ -37,14 +39,19 @@ const Notifications = () => {
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <h1 className="text-white text-lg font-medium">Notificações</h1>
+          {unreadCount > 0 && (
+            <span className="bg-white text-primary text-xs font-medium px-2 py-1 rounded-full">
+              {unreadCount}
+            </span>
+          )}
         </div>
       </section>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {notifications.map((notification) => (
           <Link to={`/notifications/${notification.id}`} key={notification.id}>
-            <Card 
-              className={`p-4 hover:shadow-md transition-shadow ${!notification.read ? 'bg-primary/5' : ''}`}
+            <Card
+              className={`p-4 mb-4 hover:shadow-md transition-shadow ${!notification.read ? 'bg-primary/5' : ''}`}
             >
               <h3 className="font-medium">{notification.title}</h3>
               <p className="text-sm text-gray-500 mt-1">{notification.message}</p>

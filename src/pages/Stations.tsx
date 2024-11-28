@@ -2,19 +2,18 @@ import { useState } from "react";
 import { Filter, ArrowLeft, Navigation, MapPin, Droplets, Fuel, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FiltersModal } from "@/components/stations/FiltersModal";
 import { StationsList } from "@/components/stations/StationsList";
 import { LocationSelector } from "@/components/LocationSelector";
 import { useStations } from "@/hooks/useStations";
 import { useLocation } from "@/contexts/LocationContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 
 const Stations = () => {
   const [selectedFuel, setSelectedFuel] = useState("regular");
   const [sortBy, setSortBy] = useState("distance");
   const [maxDistance, setMaxDistance] = useState(10);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
   const { location } = useLocation();
@@ -53,7 +52,7 @@ const Stations = () => {
 
       return (
         <div className="flex flex-col min-h-screen bg-gray-50">
-          <section className="bg-gradient-to-r from-primary to-[#10B981] p-6 -mx-6">
+          <section className="bg-gradient-to-r from-primary to-[#10B981] p-6">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
                 <ArrowLeft className="h-5 w-5" />
@@ -62,7 +61,7 @@ const Stations = () => {
             </div>
           </section>
 
-          <div className="flex flex-col gap-4 p-4 mt-4 max-w-md mx-auto">
+          <div className="flex flex-col gap-4 p-4 pb-20">
             <div className="flex gap-4 items-start">
               <img 
                 src={station.image_url || 'https://images.unsplash.com/photo-1483058712412-4245e9b90334'} 
@@ -72,9 +71,9 @@ const Stations = () => {
               <div>
                 <div className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 mt-1 text-gray-500 shrink-0" />
-                  <p className="text-gray-600">{station.address}</p>
+                  <p className="text-sm text-gray-600">{station.address}</p>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 mt-2">
                   {station.calculatedDistance?.toFixed(1)}km • {drivingTimeMinutes} min de carro
                 </p>
               </div>
@@ -86,28 +85,28 @@ const Stations = () => {
                   <Fuel className="w-4 h-4 text-green-600" />
                   <p className="text-sm text-gray-600">Comum</p>
                 </div>
-                <p className="text-xl font-bold text-green-700">R$ {station.prices.regular.toFixed(2)}</p>
+                <p className="text-lg font-bold text-green-700">R$ {station.prices.regular.toFixed(2)}</p>
               </Card>
               <Card className="p-4 bg-gradient-to-br from-blue-50 to-white">
                 <div className="flex items-center gap-2 mb-2">
                   <Droplets className="w-4 h-4 text-blue-600" />
                   <p className="text-sm text-gray-600">Aditivada</p>
                 </div>
-                <p className="text-xl font-bold text-blue-700">R$ {station.prices.premium.toFixed(2)}</p>
+                <p className="text-lg font-bold text-blue-700">R$ {station.prices.premium.toFixed(2)}</p>
               </Card>
               <Card className="p-4 bg-gradient-to-br from-yellow-50 to-white">
                 <div className="flex items-center gap-2 mb-2">
                   <Fuel className="w-4 h-4 text-yellow-600" />
                   <p className="text-sm text-gray-600">Etanol</p>
                 </div>
-                <p className="text-xl font-bold text-yellow-700">R$ {station.prices.ethanol.toFixed(2)}</p>
+                <p className="text-lg font-bold text-yellow-700">R$ {station.prices.ethanol.toFixed(2)}</p>
               </Card>
               <Card className="p-4 bg-gradient-to-br from-gray-50 to-white">
                 <div className="flex items-center gap-2 mb-2">
                   <Truck className="w-4 h-4 text-gray-600" />
                   <p className="text-sm text-gray-600">Diesel</p>
                 </div>
-                <p className="text-xl font-bold text-gray-700">R$ {station.prices.diesel.toFixed(2)}</p>
+                <p className="text-lg font-bold text-gray-700">R$ {station.prices.diesel.toFixed(2)}</p>
               </Card>
             </div>
 
@@ -150,44 +149,60 @@ const Stations = () => {
         <div className="flex flex-col gap-4">
           <h1 className="text-white text-lg font-medium">Postos</h1>
           <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-white" />
+            <MapPin className="w-5 h-5 text-white shrink-0" />
             <LocationSelector />
           </div>
         </div>
       </section>
 
-      <div className="flex gap-2">
-        <div className="flex-1">
-          <Select value={selectedFuel} onValueChange={setSelectedFuel}>
-            <SelectTrigger className="bg-white">
-              <SelectValue placeholder="Tipo de combustível" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="regular">Gasolina</SelectItem>
-              <SelectItem value="ethanol">Etanol</SelectItem>
-              <SelectItem value="diesel">Diesel</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <Select value={selectedFuel} onValueChange={setSelectedFuel}>
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="Tipo de combustível" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="regular">Gasolina</SelectItem>
+                <SelectItem value="ethanol">Etanol</SelectItem>
+                <SelectItem value="diesel">Diesel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <Button variant="outline" onClick={() => setIsFiltersOpen(true)} className="bg-white">
-          <Filter className="h-4 w-4" />
-        </Button>
+        <div className="space-y-4 bg-white p-4 rounded-lg">
+          <div>
+            <label className="text-sm text-gray-500 mb-2 block">Ordenar por</label>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="price">Preço</SelectItem>
+                <SelectItem value="distance">Distância</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm text-gray-500 mb-2 block">
+              Distância máxima: {maxDistance}km
+            </label>
+            <Slider
+              value={[maxDistance]}
+              onValueChange={([value]) => setMaxDistance(value)}
+              max={100}
+              step={1}
+            />
+          </div>
+        </div>
       </div>
 
       <StationsList 
         stations={processedStations || []} 
         selectedFuel={selectedFuel}
         isLoading={isLoading}
-      />
-
-      <FiltersModal
-        open={isFiltersOpen}
-        onOpenChange={setIsFiltersOpen}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        maxDistance={maxDistance}
-        setMaxDistance={setMaxDistance}
       />
     </div>
   );

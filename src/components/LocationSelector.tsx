@@ -17,6 +17,9 @@ export function LocationSelector() {
   const { location, getCurrentLocation, updateLocation } = useLocation();
   const { toast } = useToast();
 
+  // Remove country from address
+  const formattedAddress = location?.address ? location.address.split(',').slice(0, -1).join(',') : 'Carregando localização...';
+
   const handleManualLocation = async () => {
     if (!address) return;
 
@@ -48,15 +51,15 @@ export function LocationSelector() {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 flex items-center gap-2">
+    <div className="flex items-center gap-2 max-w-[calc(100vw-120px)]">
+      <div className="flex-1 flex items-center gap-2 min-w-0">
         <p className="text-white text-sm truncate">
-          {location?.address || 'Carregando localização...'}
+          {formattedAddress}
         </p>
         <Button
           variant="ghost"
           size="sm"
-          className="text-white p-0 h-auto"
+          className="text-white p-0 h-auto shrink-0"
           onClick={() => setIsOpen(true)}
         >
           <ChevronDown className="h-4 w-4" />

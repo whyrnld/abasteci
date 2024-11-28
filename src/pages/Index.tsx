@@ -16,6 +16,14 @@ const Index = () => {
   const [selectedFuel, setSelectedFuel] = useState('regular');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const { stations, isLoading } = useStations();
+
+  // Mock notifications data - In a real app, this would come from an API
+  const notifications = [
+    { id: 1, title: "Nota fiscal aprovada", read: false },
+    { id: 2, title: "Cashback recebido", read: true },
+  ];
+  
+  const unreadCount = notifications.filter(n => !n.read).length;
   
   useEffect(() => {
     if (navigator.geolocation) {
@@ -44,9 +52,14 @@ const Index = () => {
       <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-white text-xl font-medium">Olá, João</h1>
-          <Link to="/notifications">
+          <Link to="/notifications" className="relative">
             <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
               <Bell className="h-6 w-6" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full">
+                  {unreadCount}
+                </span>
+              )}
             </Button>
           </Link>
         </div>
@@ -82,42 +95,47 @@ const Index = () => {
           </Select>
         </div>
         <div className="space-y-3">
-          {sortedStations?.map((station) => (
-            <Link 
-              key={station.id} 
-              to={`/stations/${station.id}`}
-              className="block"
-            >
-              <Card className="p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-gray-50 to-white">
-                <div className="flex items-center gap-3">
-                  <img 
-                    src={station.image_url || '/placeholder.svg'} 
-                    alt={station.name} 
-                    className="w-10 h-10 object-cover rounded-full"
-                  />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium">{station.name}</p>
-                        <p className="text-sm text-gray-500">{station.lastUpdate}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-primary font-medium">
-                          {selectedFuel === 'regular' ? 
-                            formatCurrency(station.prices.regular) :
-                            formatCurrency(station.prices.premium)
-                          }
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {station.calculatedDistance ? `${station.calculatedDistance.toFixed(1)}km` : '--'}
-                        </p>
+          {sortedStations?.map((station) => {
+            // Remove country from address
+            const formattedAddress = station.address.split(',').slice(0, -1).join(',');
+            
+            return (
+              <Link 
+                key={station.id} 
+                to={`/stations/${station.id}`}
+                className="block"
+              >
+                <Card className="p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-gray-50 to-white">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={station.image_url || '/placeholder.svg'} 
+                      alt={station.name} 
+                      className="w-10 h-10 object-cover rounded-full"
+                    />
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-medium">{station.name}</p>
+                          <p className="text-xs text-gray-500">{formattedAddress}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-primary font-medium">
+                            {selectedFuel === 'regular' ? 
+                              formatCurrency(station.prices.regular) :
+                              formatCurrency(station.prices.premium)
+                            }
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {station.calculatedDistance ? `${station.calculatedDistance.toFixed(1)}km` : '--'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>

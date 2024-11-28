@@ -41,6 +41,9 @@ export const StationCard = ({ station, selectedFuel }: StationCardProps) => {
     }
   }, [station]);
 
+  // Remove country name from address
+  const formattedAddress = station.address.split(',').slice(0, -1).join(',');
+
   return (
     <Link to={`/stations/${station.id}`} className="block">
       <Card className="p-4 hover:shadow-md transition-shadow">
@@ -53,14 +56,14 @@ export const StationCard = ({ station, selectedFuel }: StationCardProps) => {
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <p className="font-medium">{station.name}</p>
-              <p className="text-sm text-gray-500">{distance}</p>
+              <p className="text-xs text-gray-500">{distance}</p>
             </div>
-            <p className="text-sm text-gray-500 mt-1">{station.address}</p>
+            <p className="text-xs text-gray-500 mt-1">{formattedAddress}</p>
             <div className="flex justify-between items-center mt-2">
-              <p className="text-primary font-medium">
+              <p className="text-sm text-primary">
                 Comum: R$ {station.prices.regular.toFixed(2)}
               </p>
-              <p className="text-primary font-medium">
+              <p className="text-sm text-primary">
                 Aditivada: R$ {station.prices.premium.toFixed(2)}
               </p>
             </div>

@@ -15,7 +15,7 @@ const BottomNav = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-50">
       <div className="flex justify-between items-center max-w-md mx-auto">
         {navItems.map(({ icon: Icon, label, path }) => (
           <Link
