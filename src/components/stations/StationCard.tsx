@@ -29,6 +29,8 @@ export const StationCard = ({ station, selectedFuel }: StationCardProps) => {
           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
           const calculatedDistance = R * c;
           
+          // Store the calculated distance in the station object
+          station.calculatedDistance = calculatedDistance;
           setDistance(`${calculatedDistance.toFixed(1)}km`);
         },
         (error) => {
@@ -37,7 +39,7 @@ export const StationCard = ({ station, selectedFuel }: StationCardProps) => {
         }
       );
     }
-  }, [station.latitude, station.longitude]);
+  }, [station]);
 
   return (
     <Link to={`/stations/${station.id}`} className="block">

@@ -18,6 +18,7 @@ export interface Station {
   };
   distance: string;
   lastUpdate: string;
+  calculatedDistance?: number;
 }
 
 export const useStations = () => {
@@ -40,7 +41,7 @@ export const useStations = () => {
           diesel: station.prices[0].diesel,
         },
         lastUpdate: new Date(station.prices[0].updated_at).toLocaleString(),
-        distance: '1.2km', // TODO: Calculate real distance
+        distance: '1.2km', // This will be replaced by calculated distance
       })) as Station[];
     },
   });

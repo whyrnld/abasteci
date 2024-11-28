@@ -53,7 +53,7 @@ export const FiltersModal = ({
             <Slider
               value={[maxDistance]}
               onValueChange={([value]) => setMaxDistance(value)}
-              max={20}
+              max={100}
               step={1}
             />
           </div>
