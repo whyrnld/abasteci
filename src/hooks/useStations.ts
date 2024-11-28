@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { useLocation } from '@/contexts/LocationContext';
+import { calculateDistance } from '@/utils/distance';
 
 export interface Station {
   id: number;
@@ -22,8 +24,10 @@ export interface Station {
 }
 
 export const useStations = () => {
+  const { location } = useLocation();
+
   const { data: stations, isLoading } = useQuery({
-    queryKey: ['stations'],
+    queryKey: ['stations', location?.lat, location?.lng],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('stations')
@@ -32,18 +36,30 @@ export const useStations = () => {
 
       if (error) throw error;
 
-      return data.map((station: any) => ({
-        ...station,
-        prices: {
-          regular: station.prices[0].regular,
-          premium: station.prices[0].premium,
-          ethanol: station.prices[0].ethanol,
-          diesel: station.prices[0].diesel,
-        },
-        lastUpdate: new Date(station.prices[0].updated_at).toLocaleString(),
-        distance: '1.2km', // This will be replaced by calculated distance
-      })) as Station[];
+      return data.map((station: any) => {
+        const calculatedDistance = location
+          ? calculateDistance(
+              location.lat,
+              location.lng,
+              station.latitude,
+              station.longitude
+            )
+          : undefined;
+
+        return {
+          ...station,
+          prices: {
+            regular: station.prices[0].regular,
+            premium: station.prices[0].premium,
+            ethanol: station.prices[0].ethanol,
+            diesel: station.prices[0].diesel,
+          },
+          lastUpdate: new Date(station.prices[0].updated_at).toLocaleString(),
+          calculatedDistance,
+        };
+      }) as Station[];
     },
+    enabled: true,
   });
 
   return {
