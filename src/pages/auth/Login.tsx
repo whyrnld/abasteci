@@ -22,14 +22,28 @@ const Login = () => {
 
     try {
       const cleanCPF = cpf.replace(/\D/g, "");
+      
+      // Validate CPF length
+      if (cleanCPF.length !== 11) {
+        toast({
+          variant: "destructive",
+          title: "CPF inválido",
+          description: "Por favor, insira um CPF válido.",
+        });
+        setLoading(false);
+        return;
+      }
+
       const email = `${cleanCPF}@fuelfolio.app`;
       
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("Auth error details:", error);
+        
         if (error.message.includes("Invalid login credentials")) {
           toast({
             variant: "destructive",
@@ -40,25 +54,26 @@ const Login = () => {
           toast({
             variant: "destructive",
             title: "Erro ao fazer login",
-            description: "Ocorreu um erro inesperado. Tente novamente.",
+            description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
           });
-          console.error("Login error:", error);
         }
         return;
       }
 
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta!",
-      });
-      navigate("/");
+      if (data.user) {
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo de volta!",
+        });
+        navigate("/");
+      }
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Erro ao fazer login",
-        description: "Ocorreu um erro inesperado. Tente novamente.",
+        description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
       });
-      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
