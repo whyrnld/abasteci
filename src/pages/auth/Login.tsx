@@ -22,8 +22,9 @@ const Login = () => {
 
     try {
       const cleanCPF = cpf.replace(/\D/g, "");
+      const email = `${cleanCPF}@fuelfolio.app`;
       const { data: { user }, error } = await supabase.auth.signInWithPassword({
-        email: `${cleanCPF}@fuelfolio.app`,
+        email,
         password,
       });
 
@@ -40,7 +41,9 @@ const Login = () => {
       toast({
         variant: "destructive",
         title: "Erro ao fazer login",
-        description: "CPF ou senha incorretos.",
+        description: error.message === "Invalid login credentials" 
+          ? "CPF ou senha incorretos."
+          : "Ocorreu um erro ao fazer login. Tente novamente.",
       });
     } finally {
       setLoading(false);
@@ -51,7 +54,6 @@ const Login = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
         <div className="mx-auto w-full max-w-sm">
-          {/* Logo space */}
           <div className="h-24 w-full flex items-center justify-center mb-8">
             <div className="text-center text-gray-400">Espaço para Logo</div>
           </div>
