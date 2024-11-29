@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { maskCPF } from "@/lib/utils";
 
@@ -23,28 +23,42 @@ const Login = () => {
     try {
       const cleanCPF = cpf.replace(/\D/g, "");
       const email = `${cleanCPF}@fuelfolio.app`;
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({
+      
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
-
-      if (user) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo de volta!",
-        });
-        navigate("/");
+      if (error) {
+        if (error.message.includes("Invalid login credentials")) {
+          toast({
+            variant: "destructive",
+            title: "Erro ao fazer login",
+            description: "CPF ou senha incorretos.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Erro ao fazer login",
+            description: "Ocorreu um erro inesperado. Tente novamente.",
+          });
+          console.error("Login error:", error);
+        }
+        return;
       }
+
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo de volta!",
+      });
+      navigate("/");
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erro ao fazer login",
-        description: error.message === "Invalid login credentials" 
-          ? "CPF ou senha incorretos."
-          : "Ocorreu um erro ao fazer login. Tente novamente.",
+        description: "Ocorreu um erro inesperado. Tente novamente.",
       });
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
