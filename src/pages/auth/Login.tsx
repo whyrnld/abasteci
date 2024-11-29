@@ -23,14 +23,12 @@ const Login = () => {
     try {
       const cleanCPF = cpf.replace(/\D/g, "");
       
-      // Validate CPF length
       if (cleanCPF.length !== 11) {
         toast({
           variant: "destructive",
           title: "CPF inválido",
           description: "Por favor, insira um CPF válido.",
         });
-        setLoading(false);
         return;
       }
 
@@ -42,8 +40,6 @@ const Login = () => {
       });
 
       if (error) {
-        console.error("Auth error details:", error);
-        
         if (error.message.includes("Invalid login credentials")) {
           toast({
             variant: "destructive",
@@ -56,6 +52,7 @@ const Login = () => {
             title: "Erro ao fazer login",
             description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
           });
+          console.error("Login error details:", error);
         }
         return;
       }
