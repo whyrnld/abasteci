@@ -5,11 +5,10 @@ import { useToast } from '@/components/ui/use-toast';
 
 interface Profile {
   id: string;
-  name: string;
-  email: string;
-  referral_code: string;
-  balance: number;
-  pending_balance: number;
+  full_name: string;
+  cpf: string;
+  phone: string;
+  birth_date: string;
 }
 
 export const useProfile = () => {

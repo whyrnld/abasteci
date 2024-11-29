@@ -4,11 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
   Bell,
-  CreditCard,
   LogOut,
-  Share2,
-  Star,
-  User,
   Sliders,
 } from "lucide-react";
 import {
@@ -21,6 +17,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/components/ui/use-toast";
+import { useProfile } from "@/hooks/useProfile";
 
 const Settings = () => {
   const [preferredFuel, setPreferredFuel] = useState("regular");
@@ -29,6 +29,28 @@ const Settings = () => {
   const [receiptAlerts, setReceiptAlerts] = useState(true);
   const [defaultPixKey, setDefaultPixKey] = useState("");
   const [defaultPixKeyType, setDefaultPixKeyType] = useState("cpf");
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { profile } = useProfile();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+      navigate("/auth/login");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao sair",
+        description: "Não foi possível realizar o logout.",
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6 pb-20">
@@ -38,14 +60,11 @@ const Settings = () => {
 
       <div className="space-y-4">
         <Card className="p-4">
-          <h3 className="font-medium mb-4 flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Perfil
-          </h3>
+          <h3 className="font-medium mb-4">Perfil</h3>
           <div className="space-y-2">
-            <p className="text-sm text-gray-500">Nome: João Silva</p>
-            <p className="text-sm text-gray-500">Email: joao@email.com</p>
-            <p className="text-sm text-gray-500">CPF: ***.***.***-**</p>
+            <p className="text-sm text-gray-500">Nome: {profile?.full_name}</p>
+            <p className="text-sm text-gray-500">CPF: {profile?.cpf}</p>
+            <p className="text-sm text-gray-500">Telefone: {profile?.phone}</p>
           </div>
         </Card>
 
@@ -140,7 +159,11 @@ const Settings = () => {
           </div>
         </Card>
 
-        <Button variant="destructive" className="w-full">
+        <Button 
+          variant="destructive" 
+          className="w-full"
+          onClick={handleLogout}
+        >
           <LogOut className="w-5 h-5 mr-2" />
           Sair
         </Button>

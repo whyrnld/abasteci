@@ -2,13 +2,14 @@ import { Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getFirstName } from "@/lib/utils";
 import BalanceCard from "@/components/BalanceCard";
 import PremiumCard from "@/components/PremiumCard";
 import ReferralCard from "@/components/ReferralCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { useStations } from "@/hooks/useStations";
+import { useProfile } from "@/hooks/useProfile";
 
 const Index = () => {
   const balance = 15.50;
@@ -16,6 +17,7 @@ const Index = () => {
   const [selectedFuel, setSelectedFuel] = useState('regular');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const { stations, isLoading } = useStations();
+  const { profile } = useProfile();
 
   // Mock notifications data - In a real app, this would come from an API
   const notifications = [
@@ -51,7 +53,9 @@ const Index = () => {
     <div className="flex flex-col gap-6 pb-20">
       <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-white text-xl font-medium">Olá, João</h1>
+          <h1 className="text-white text-xl font-medium">
+            Olá, {profile ? getFirstName(profile.full_name) : ""}
+          </h1>
           <Link to="/notifications" className="relative">
             <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
               <Bell className="h-6 w-6" />

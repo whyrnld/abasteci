@@ -50,6 +50,36 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          birth_date: string
+          cpf: string
+          created_at: string
+          full_name: string
+          id: string
+          phone: string
+          updated_at: string
+        }
+        Insert: {
+          birth_date: string
+          cpf: string
+          created_at?: string
+          full_name: string
+          id: string
+          phone: string
+          updated_at?: string
+        }
+        Update: {
+          birth_date?: string
+          cpf?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       stations: {
         Row: {
           address: string
