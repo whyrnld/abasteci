@@ -13,22 +13,78 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cpfError, setCpfError] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const validateCPF = (cpf: string) => {
+    const cleanCPF = cpf.replace(/\D/g, "");
+    
+    if (cleanCPF.length !== 11) {
+      return false;
+    }
+
+    // Validação do CPF
+    let sum = 0;
+    let remainder;
+
+    if (
+      cleanCPF === "00000000000" ||
+      cleanCPF === "11111111111" ||
+      cleanCPF === "22222222222" ||
+      cleanCPF === "33333333333" ||
+      cleanCPF === "44444444444" ||
+      cleanCPF === "55555555555" ||
+      cleanCPF === "66666666666" ||
+      cleanCPF === "77777777777" ||
+      cleanCPF === "88888888888" ||
+      cleanCPF === "99999999999"
+    ) {
+      return false;
+    }
+
+    for (let i = 1; i <= 9; i++) {
+      sum = sum + parseInt(cleanCPF.substring(i - 1, i)) * (11 - i);
+    }
+
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanCPF.substring(9, 10))) return false;
+
+    sum = 0;
+    for (let i = 1; i <= 10; i++) {
+      sum = sum + parseInt(cleanCPF.substring(i - 1, i)) * (12 - i);
+    }
+
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cleanCPF.substring(10, 11))) return false;
+
+    return true;
+  };
+
+  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+    setCpf(value);
+    setCpfError("");
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setCpfError("");
 
     try {
       const cleanCPF = cpf.replace(/\D/g, "");
       
-      if (cleanCPF.length !== 11) {
+      if (!validateCPF(cleanCPF)) {
+        setCpfError("CPF inválido");
         toast({
           variant: "destructive",
           title: "CPF inválido",
           description: "Por favor, insira um CPF válido.",
         });
+        setLoading(false);
         return;
       }
 
@@ -94,12 +150,16 @@ const Login = () => {
               <Input
                 id="cpf"
                 type="text"
+                inputMode="numeric"
                 value={maskCPF(cpf)}
-                onChange={(e) => setCpf(e.target.value)}
+                onChange={handleCPFChange}
                 placeholder="000.000.000-00"
                 required
-                className="mt-2"
+                className={`mt-2 ${cpfError ? 'border-red-500' : ''}`}
               />
+              {cpfError && (
+                <p className="text-sm text-red-500 mt-1">{cpfError}</p>
+              )}
             </div>
 
             <div>

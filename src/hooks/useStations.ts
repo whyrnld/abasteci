@@ -27,7 +27,7 @@ export const useStations = () => {
   const { location } = useLocation();
 
   return useQuery({
-    queryKey: ['stations', location?.lat, location?.lng],
+    queryKey: ['stations'],
     queryFn: async () => {
       const { data: stations, error: stationsError } = await supabase
         .from('stations')
@@ -38,10 +38,6 @@ export const useStations = () => {
         throw stationsError;
       }
 
-      // Log the stations data to debug
-      console.log('Stations data:', stations);
-
-      // Fetch prices for all stations
       const { data: prices, error: pricesError } = await supabase
         .from('prices')
         .select('*')
@@ -52,10 +48,6 @@ export const useStations = () => {
         throw pricesError;
       }
 
-      // Log the prices data to debug
-      console.log('Prices data:', prices);
-
-      // Group prices by station_id and get the latest price for each station
       const latestPrices = prices.reduce((acc: Record<number, any>, price) => {
         if (!acc[price.station_id] || new Date(price.created_at) > new Date(acc[price.station_id].created_at)) {
           acc[price.station_id] = price;
@@ -63,7 +55,6 @@ export const useStations = () => {
         return acc;
       }, {});
 
-      // Map stations with their latest prices and calculate distances
       const processedStations = stations?.map((station: any) => {
         const stationPrices = latestPrices[station.id] || {
           regular: 0,
@@ -97,11 +88,7 @@ export const useStations = () => {
         };
       }) || [];
 
-      // Log the final processed stations to debug
-      console.log('Processed stations:', processedStations);
-
       return processedStations;
     },
-    enabled: !!location,
   });
 };
