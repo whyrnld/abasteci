@@ -58,6 +58,10 @@ export type Database = {
           full_name: string
           id: string
           phone: string
+          pix_key: string | null
+          pix_key_type: string | null
+          preferred_fuel_type: string | null
+          search_radius: number | null
           updated_at: string
         }
         Insert: {
@@ -67,6 +71,10 @@ export type Database = {
           full_name: string
           id: string
           phone: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          preferred_fuel_type?: string | null
+          search_radius?: number | null
           updated_at?: string
         }
         Update: {
@@ -76,6 +84,10 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string
+          pix_key?: string | null
+          pix_key_type?: string | null
+          preferred_fuel_type?: string | null
+          search_radius?: number | null
           updated_at?: string
         }
         Relationships: []

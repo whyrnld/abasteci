@@ -14,10 +14,16 @@ import { useProfile } from "@/hooks/useProfile";
 const Index = () => {
   const balance = 15.50;
   const pendingBalance = 5.20;
-  const [selectedFuel, setSelectedFuel] = useState('regular');
+  const { profile } = useProfile();
+  const [selectedFuel, setSelectedFuel] = useState(profile?.preferred_fuel_type || 'regular');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const { stations, isLoading } = useStations();
-  const { profile } = useProfile();
+
+  useEffect(() => {
+    if (profile?.preferred_fuel_type) {
+      setSelectedFuel(profile.preferred_fuel_type);
+    }
+  }, [profile]);
 
   // Mock notifications data - In a real app, this would come from an API
   const notifications = [

@@ -2,11 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Bell,
-  LogOut,
-  Sliders,
-} from "lucide-react";
+import { Bell, LogOut, Sliders } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
@@ -24,14 +20,40 @@ import { useProfile } from "@/hooks/useProfile";
 
 const Settings = () => {
   const [preferredFuel, setPreferredFuel] = useState("regular");
-  const [searchRadius, setSearchRadius] = useState(5);
+  const [searchRadius, setSearchRadius] = useState(10);
   const [priceAlerts, setPriceAlerts] = useState(true);
   const [receiptAlerts, setReceiptAlerts] = useState(true);
   const [defaultPixKey, setDefaultPixKey] = useState("");
   const [defaultPixKeyType, setDefaultPixKeyType] = useState("cpf");
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { profile } = useProfile();
+  const { profile, updateProfile } = useProfile();
+
+  useEffect(() => {
+    if (profile) {
+      setPreferredFuel(profile.preferred_fuel_type || "regular");
+      setSearchRadius(profile.search_radius || 10);
+      setDefaultPixKey(profile.pix_key || "");
+      setDefaultPixKeyType(profile.pix_key_type || "cpf");
+    }
+  }, [profile]);
+
+  const handleSavePreferences = async () => {
+    try {
+      await updateProfile.mutateAsync({
+        preferred_fuel_type: preferredFuel,
+        search_radius: searchRadius,
+        pix_key: defaultPixKey,
+        pix_key_type: defaultPixKeyType,
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível salvar as preferências.",
+      });
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -93,6 +115,9 @@ const Settings = () => {
                 placeholder="Digite sua chave PIX"
               />
             </div>
+            <Button onClick={handleSavePreferences} className="w-full">
+              Salvar Chave PIX
+            </Button>
           </div>
         </Card>
 
@@ -125,10 +150,13 @@ const Settings = () => {
               <Slider
                 value={[searchRadius]}
                 onValueChange={([value]) => setSearchRadius(value)}
-                max={20}
+                max={100}
                 step={1}
               />
             </div>
+            <Button onClick={handleSavePreferences} className="w-full">
+              Salvar Preferências
+            </Button>
           </div>
         </Card>
 
