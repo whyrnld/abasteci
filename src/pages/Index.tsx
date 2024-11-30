@@ -17,7 +17,7 @@ const Index = () => {
   const { profile } = useProfile();
   const [selectedFuel, setSelectedFuel] = useState(profile?.preferred_fuel_type || 'regular');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const { stations, isLoading } = useStations();
+  const { data: stations, isLoading } = useStations();
 
   useEffect(() => {
     if (profile?.preferred_fuel_type) {

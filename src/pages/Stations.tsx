@@ -18,7 +18,7 @@ const Stations = () => {
   const navigate = useNavigate();
   const { location } = useLocation();
   
-  const { stations, isLoading } = useStations();
+  const { data: stations, isLoading } = useStations();
 
   // Filter and sort stations
   const processedStations = stations?.filter(station => {
