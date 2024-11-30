@@ -26,17 +26,39 @@ export interface Station {
 export const useStations = () => {
   const { location } = useLocation();
 
-  const { data: stations, isLoading } = useQuery({
+  return useQuery({
     queryKey: ['stations', location?.lat, location?.lng],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: stationsData, error: stationsError } = await supabase
         .from('stations')
-        .select('*, prices!inner(regular, premium, ethanol, diesel, updated_at)')
-        .order('name');
+        .select('*');
 
-      if (error) throw error;
+      if (stationsError) throw stationsError;
 
-      return data.map((station: any) => {
+      const { data: pricesData, error: pricesError } = await supabase
+        .from('prices')
+        .select('*')
+        .order('updated_at', { ascending: false });
+
+      if (pricesError) throw pricesError;
+
+      // Group prices by station_id and get the latest price for each station
+      const latestPrices = pricesData.reduce((acc: any, price) => {
+        if (!acc[price.station_id] || new Date(price.updated_at) > new Date(acc[price.station_id].updated_at)) {
+          acc[price.station_id] = price;
+        }
+        return acc;
+      }, {});
+
+      return stationsData.map((station: any) => {
+        const stationPrices = latestPrices[station.id] || {
+          regular: 0,
+          premium: 0,
+          ethanol: 0,
+          diesel: 0,
+          updated_at: new Date().toISOString()
+        };
+
         const calculatedDistance = location
           ? calculateDistance(
               location.lat,
@@ -49,21 +71,16 @@ export const useStations = () => {
         return {
           ...station,
           prices: {
-            regular: station.prices[0].regular,
-            premium: station.prices[0].premium,
-            ethanol: station.prices[0].ethanol,
-            diesel: station.prices[0].diesel,
+            regular: stationPrices.regular,
+            premium: stationPrices.premium,
+            ethanol: stationPrices.ethanol,
+            diesel: stationPrices.diesel,
           },
-          lastUpdate: new Date(station.prices[0].updated_at).toLocaleString(),
+          lastUpdate: new Date(stationPrices.updated_at).toLocaleString(),
           calculatedDistance,
         };
       }) as Station[];
     },
     enabled: true,
   });
-
-  return {
-    stations,
-    isLoading,
-  };
 };

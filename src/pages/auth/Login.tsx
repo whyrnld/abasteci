@@ -108,12 +108,12 @@ const Login = () => {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Digite sua senha"
                   required
-                  pattern="[0-9]{6}"
-                  title="A senha deve conter 6 números"
                   maxLength={6}
                   className="pr-10"
                 />
