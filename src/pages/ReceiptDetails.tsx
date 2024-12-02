@@ -26,6 +26,15 @@ const ReceiptDetails = () => {
     },
   });
 
+  const getStatusInPortuguese = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'processing': 'Em análise',
+      'approved': 'Aprovado',
+      'rejected': 'Recusado'
+    };
+    return statusMap[status] || status;
+  };
+
   if (isLoading) {
     return <div>Carregando...</div>;
   }
@@ -63,7 +72,7 @@ const ReceiptDetails = () => {
             
             <div className="flex justify-between">
               <span className="text-gray-500">Status</span>
-              <span className="capitalize">{receipt.status}</span>
+              <span className="capitalize">{getStatusInPortuguese(receipt.status)}</span>
             </div>
           </div>
 
