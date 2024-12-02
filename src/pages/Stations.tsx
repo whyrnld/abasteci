@@ -83,7 +83,7 @@ const Stations = () => {
               </div>
             )}
             <div className="flex items-center gap-1">
-              <span>Última atualização: {new Date(singleStation.prices.updated_at).toLocaleDateString()} às {new Date(singleStation.prices.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span>Atualizado: {new Date(singleStation.prices.updated_at).toLocaleDateString()} às {new Date(singleStation.prices.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           </div>
 

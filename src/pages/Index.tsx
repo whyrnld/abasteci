@@ -63,12 +63,12 @@ const Index = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20 px-6 py-6" >
-      <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
+      <section className="bg-gradient-to-r from-green-200 to-teal-300 p-6 pt-8 -mx-6 -mt-6">
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col">
-            <img src="/abasteci.svg" alt="Abasteça+" className="h-8 mb-2" />
-            <h2 className="text-white text-sm font-medium">
-              Olá, {profile ? getFirstName(profile.full_name) : ""}
+            <img src="/abasteci.svg" alt="abasteci" className="h-8 mb-2" />
+            <h2 className="text-white text-sm font-medium text-green-800 ">
+              Olá, {profile ? getFirstName(profile.full_name) : "" } 👋
             </h2>
           </div>
           <Link to="/notifications" className="relative">
@@ -89,7 +89,7 @@ const Index = () => {
         <h2 className="text-xl font-semibold text-secondary mb-2">
           Economize em seus abastecimentos!
         </h2>
-        <p className="text-gray-700 leading-relaxed">
+        <p className="text-gray-700 text-sm leading-relaxed">
           Compare preços dos postos próximos a você e ganhe cashback ao enviar suas notas fiscais. 
           Abasteça mais pagando menos e ainda receba dinheiro de volta!
         </p>
