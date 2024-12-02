@@ -37,9 +37,13 @@ export const useReceipts = () => {
   const submitReceipt = useMutation({
     mutationFn: async (newReceipt: Partial<Receipt>) => {
       if (!user?.id) throw new Error('No user');
+      
+      // Remove any id if present to let the database generate it
+      const { id, ...receiptData } = newReceipt;
+      
       const { data, error } = await supabase
         .from('receipts')
-        .insert([{ ...newReceipt, user_id: user.id }])
+        .insert([{ ...receiptData, user_id: user.id }])
         .select()
         .single();
 
@@ -54,6 +58,7 @@ export const useReceipts = () => {
       });
     },
     onError: (error) => {
+      console.error('Error submitting receipt:', error);
       toast({
         variant: 'destructive',
         title: 'Erro',
