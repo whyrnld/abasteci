@@ -13,6 +13,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useLocation } from "@/contexts/LocationContext";
 import { calculateDistance } from "@/utils/distance";
 import { Navigation } from "lucide-react";
+import { StationCard } from "@/components/stations/StationCard";
 
 const Index = () => {
   const balance = 15.50;
@@ -112,38 +113,12 @@ const Index = () => {
         ) : processedStations.length > 0 ? (
           <div className="flex flex-col py-4">
             {processedStations.map((station) => (
-              <Link key={station.id} to={`/stations/${station.id}`}>
-                <Card className="p-4 hover:shadow-md transition-shadow mb-4">
-                  <div className="flex gap-4">
-                    <img 
-                      src={station.image_url || 'https://images.unsplash.com/photo-1483058712412-4245e9b90334'} 
-                      alt={station.name} 
-                      className="w-16 h-16 object-cover rounded-lg shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-start">
-                        <div className="min-w-0">
-                          <h3 className="font-medium truncate">{station.name}</h3>
-                          <p className="text-sm text-gray-500 truncate">{station.address}</p>
-                          {location && typeof station.calculatedDistance === 'number' && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                              <Navigation className="w-3 h-3 shrink-0" />
-                              <span>{station.calculatedDistance.toFixed(1)}km</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="text-right shrink-0">
-                          {station.prices[selectedFuel] > 0 && (
-                            <div className="text-lg font-bold text-green-600">
-                              R$ {station.prices[selectedFuel].toFixed(2)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
+              <StationCard
+                key={station.id}
+                station={station}
+                selectedFuel={selectedFuel}
+                className="mb-4"
+              />
             ))}
           </div>
         ) : (

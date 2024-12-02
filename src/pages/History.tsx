@@ -17,8 +17,8 @@ const History = () => {
 
   return (
     <div className="flex flex-col gap-6 px-6 py-6">
-      <section className="bg-gradient-to-r from-primary to-[#10B981] p-6 -mx-6 -mt-6">
-        <h1 className="text-white text-lg font-medium">Notas Fiscais</h1>
+      <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
+        <h1 className="text-white text-lg font-medium">Notas fiscais</h1>
       </section>
 
       <Tabs defaultValue="all" className="w-full mt-4">

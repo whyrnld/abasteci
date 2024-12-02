@@ -8,10 +8,10 @@ const BottomNav = () => {
   
   const navItems = [
     { icon: Home, label: "Início", path: "/" },
-    { icon: QrCode, label: "Scanner", path: "/scanner" },
     { icon: History, label: "Histórico", path: "/history" },
+    { icon: QrCode, label: "Scanner", path: "/scanner" },
     { icon: Map, label: "Postos", path: "/stations" },
-    { icon: Settings, label: "Config", path: "/settings" },
+    { icon: Settings, label: "Ajustes", path: "/settings" },
   ];
 
   return (
