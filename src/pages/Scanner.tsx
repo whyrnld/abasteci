@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { useToast } from "@/components/ui/use-toast";
+import { useReceipts } from "@/hooks/useReceipts";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,7 @@ const Scanner = () => {
   const [showScanner, setShowScanner] = useState(false);
   const [manualKey, setManualKey] = useState("");
   const { toast } = useToast();
+  const { submitReceipt } = useReceipts();
 
   useEffect(() => {
     let html5QrCode: Html5Qrcode;
@@ -30,13 +32,24 @@ const Scanner = () => {
             fps: 10,
             qrbox: { width: 250, height: 250 },
           },
-          (decodedText) => {
+          async (decodedText) => {
             html5QrCode.stop();
             setShowScanner(false);
-            toast({
-              title: "QR Code lido com sucesso!",
-              description: "O cupom fiscal foi registrado.",
-            });
+            try {
+              await submitReceipt.mutateAsync({
+                invoice_key: decodedText,
+                amount: 0, // This will be calculated by the backend
+                station_id: 1, // This should be determined by the QR code
+                status: 'processing'
+              });
+            } catch (error) {
+              console.error('Error submitting receipt:', error);
+              toast({
+                variant: "destructive",
+                title: "Erro",
+                description: "Não foi possível registrar o cupom fiscal.",
+              });
+            }
           },
           (error) => {
             console.error(error);
@@ -54,9 +67,9 @@ const Scanner = () => {
           .catch((err) => console.error("Error stopping QR Code scanner:", err));
       }
     };
-  }, [showScanner, toast]);
+  }, [showScanner, toast, submitReceipt]);
 
-  const handleManualKeySubmit = () => {
+  const handleManualKeySubmit = async () => {
     if (!manualKey) {
       toast({
         variant: "destructive",
@@ -66,11 +79,27 @@ const Scanner = () => {
       return;
     }
     
-    toast({
-      title: "Chave registrada com sucesso!",
-      description: "O cupom fiscal foi registrado.",
-    });
-    setManualKey("");
+    try {
+      await submitReceipt.mutateAsync({
+        invoice_key: manualKey,
+        amount: 0, // This will be calculated by the backend
+        station_id: 1, // This should be determined by the invoice key
+        status: 'processing'
+      });
+      
+      setManualKey("");
+      toast({
+        title: "Chave registrada com sucesso!",
+        description: "O cupom fiscal foi registrado e está em análise.",
+      });
+    } catch (error) {
+      console.error('Error submitting receipt:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível registrar o cupom fiscal.",
+      });
+    }
   };
 
   return (
