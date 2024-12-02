@@ -5,25 +5,22 @@ import type { Station } from "@/hooks/useStations";
 interface StationsListProps {
   stations: Station[];
   selectedFuel: string;
-  isLoading: boolean;
 }
 
-export const StationsList = ({ stations, selectedFuel, isLoading }: StationsListProps) => {
-  if (isLoading) {
-    return <div className="p-4 text-center">Carregando...</div>;
-  }
-
+export const StationsList = ({ stations, selectedFuel }: StationsListProps) => {
   if (!stations?.length) {
     return <div className="p-4 text-center">Nenhum posto encontrado.</div>;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-4 w-full">
       <PriceStats stations={stations} selectedFuel={selectedFuel} />
       {stations.map((station) => (
-        <div key={station.id}>
-          <StationCard station={station} selectedFuel={selectedFuel} />
-        </div>
+        <StationCard 
+          key={station.id}
+          station={station} 
+          selectedFuel={selectedFuel}
+        />
       ))}
     </div>
   );

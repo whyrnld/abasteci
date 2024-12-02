@@ -1,7 +1,7 @@
 {
-  "name": "Fuel Folio Tracker",
-  "short_name": "FuelFolio",
-  "description": "Track fuel prices and earn cashback",
+  "name": "Abasteça+",
+  "short_name": "Abasteça+",
+  "description": "Combustível no melhor preço",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

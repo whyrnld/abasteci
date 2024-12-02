@@ -14,7 +14,7 @@ const Premium = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-20">
+    <div className="flex flex-col gap-6 pb-20 px-6 py-6">
       <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6 flex items-center gap-2">
         <Button variant="ghost" onClick={() => window.history.back()} className="text-white p-2">
           ←

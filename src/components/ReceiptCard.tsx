@@ -20,7 +20,7 @@ const ReceiptCard = ({ id, station, amount, date, status }: ReceiptCardProps) =>
 
   return (
     <Link to={`/receipts/${id}`}>
-      <Card className="p-4 hover:shadow-md transition-shadow">
+      <Card className="p-4 hover:shadow-md transition-shadow my-4">
         <div className="flex items-start gap-3">
           {statusIcons[status]}
           <div className="flex-1">
