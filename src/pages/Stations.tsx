@@ -16,19 +16,19 @@ const Stations = () => {
   const [maxDistance, setMaxDistance] = useState(10);
   const { id } = useParams();
   const navigate = useNavigate();
-  const { location } = useLocation();
+  const { location, isLoading: locationLoading, getCurrentLocation } = useLocation();
   
-  const { data: stations, isLoading } = useStations();
+  const { data: stations, isLoading: stationsLoading } = useStations();
 
   // Filter and sort stations
   const processedStations = stations?.filter(station => {
     if (!location) return true;
-    const distance = station.calculatedDistance || 0;
-    return distance <= maxDistance;
+    const distance = station.calculatedDistance;
+    return typeof distance === 'number' && distance <= maxDistance;
   }).sort((a, b) => {
-    if (sortBy === "distance") {
-      const distanceA = a.calculatedDistance || 0;
-      const distanceB = b.calculatedDistance || 0;
+    if (sortBy === "distance" && location) {
+      const distanceA = a.calculatedDistance ?? Number.MAX_VALUE;
+      const distanceB = b.calculatedDistance ?? Number.MAX_VALUE;
       return distanceA - distanceB;
     } else {
       const priceA = Number(a.prices[selectedFuel as keyof typeof a.prices]) || 0;
@@ -45,109 +45,118 @@ const Stations = () => {
 
   // If we have an ID parameter, show the station details
   if (id && stations) {
-    const station = stations.find(s => s.id === parseInt(id));
-    if (station) {
-      const drivingTimeMinutes = calculateDrivingTime(station.calculatedDistance || 0);
-      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`;
+    const singleStation = stations.find(s => s.id.toString() === id);
+    if (!singleStation) return null;
 
-      return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
-          <section className="bg-gradient-to-r from-primary to-[#10B981] p-6">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <h1 className="text-lg font-medium text-white truncate">{station.name}</h1>
-            </div>
-          </section>
+    const drivingTimeMinutes = calculateDrivingTime(singleStation.calculatedDistance || 0);
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${singleStation.latitude},${singleStation.longitude}`;
 
-          <div className="flex flex-col gap-4 p-4 pb-20">
-            <div className="flex gap-4 items-start">
-              <img 
-                src={station.image_url || 'https://images.unsplash.com/photo-1483058712412-4245e9b90334'} 
-                alt={station.name} 
-                className="w-20 h-20 object-cover rounded-lg"
-              />
-              <div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 mt-1 text-gray-500 shrink-0" />
-                  <p className="text-sm text-gray-600">{station.address}</p>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  {station.calculatedDistance?.toFixed(1)}km • {drivingTimeMinutes} min de carro
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="p-4 bg-gradient-to-br from-green-50 to-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <Fuel className="w-4 h-4 text-green-600" />
-                  <p className="text-sm text-gray-600">Comum</p>
-                </div>
-                <p className="text-lg font-bold text-green-700">R$ {station.prices.regular.toFixed(2)}</p>
-              </Card>
-              <Card className="p-4 bg-gradient-to-br from-blue-50 to-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <Droplets className="w-4 h-4 text-blue-600" />
-                  <p className="text-sm text-gray-600">Aditivada</p>
-                </div>
-                <p className="text-lg font-bold text-blue-700">R$ {station.prices.premium.toFixed(2)}</p>
-              </Card>
-              <Card className="p-4 bg-gradient-to-br from-yellow-50 to-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <Fuel className="w-4 h-4 text-yellow-600" />
-                  <p className="text-sm text-gray-600">Etanol</p>
-                </div>
-                <p className="text-lg font-bold text-yellow-700">R$ {station.prices.ethanol.toFixed(2)}</p>
-              </Card>
-              <Card className="p-4 bg-gradient-to-br from-gray-50 to-white">
-                <div className="flex items-center gap-2 mb-2">
-                  <Truck className="w-4 h-4 text-gray-600" />
-                  <p className="text-sm text-gray-600">Diesel</p>
-                </div>
-                <p className="text-lg font-bold text-gray-700">R$ {station.prices.diesel.toFixed(2)}</p>
-              </Card>
-            </div>
-
-            {station.cnpj && (
-              <p className="text-xs text-gray-500">CNPJ: {station.cnpj}</p>
-            )}
-            <p className="text-xs text-gray-500">Última atualização: {station.lastUpdate}</p>
-
-            <div className="w-full h-48 rounded-lg overflow-hidden">
-              <iframe
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                style={{ border: 0 }}
-                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo&q=${station.latitude},${station.longitude}`}
-                allowFullScreen
-              />
-            </div>
-
-            <a 
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2"
-            >
-              <Button className="w-full" size="lg">
-                <Navigation className="mr-2 h-4 w-4" />
-                Ir até o posto
-              </Button>
-            </a>
+    return (
+      <div className="flex flex-col min-h-screen bg-gray-50 w-full max-w-full">
+        <section className="w-full bg-gradient-to-r from-primary to-[#10B981] p-6">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-lg font-medium text-white">{singleStation.name}</h1>
           </div>
+        </section>
+
+        <div className="flex flex-col gap-4 p-4 pb-20 w-full">
+          <div className="flex gap-4 items-start">
+            <img 
+              src={singleStation.image_url || 'https://cdn1.iconfinder.com/data/icons/prettyoffice8/256/Gas-pump.png'} 
+              alt={singleStation.name} 
+              className="w-20 h-20 object-cover rounded-lg"
+            />
+            <div className="flex-1">
+              <h2 className="font-medium text-lg">{singleStation.name}</h2>
+              <p className="text-gray-500 text-sm">{singleStation.address}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-sm text-gray-500 border-t border-b border-gray-200 py-2">
+            {location && typeof singleStation.calculatedDistance === 'number' && (
+              <div className="flex items-center gap-1">
+                <Navigation className="w-4 h-4" />
+                <span>{singleStation.calculatedDistance.toFixed(1)}km ({drivingTimeMinutes} min)</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <span>Última atualização: {new Date(singleStation.prices.updated_at).toLocaleDateString()} às {new Date(singleStation.prices.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="p-4 bg-gradient-to-br from-blue-50 to-blue-100">
+              <div className="flex items-center gap-2 text-blue-600 mb-2">
+                <Droplets className="w-5 h-5" />
+                <span className="font-medium">Comum</span>
+              </div>
+              <div className="text-2xl font-bold text-blue-700">
+                R$ {singleStation.prices.regular.toFixed(2)}
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-gradient-to-br from-purple-50 to-purple-100">
+              <div className="flex items-center gap-2 text-purple-600 mb-2">
+                <Fuel className="w-5 h-5" />
+                <span className="font-medium">Aditivada</span>
+              </div>
+              <div className="text-2xl font-bold text-purple-700">
+                R$ {singleStation.prices.premium.toFixed(2)}
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-gradient-to-br from-green-50 to-green-100">
+              <div className="flex items-center gap-2 text-green-600 mb-2">
+                <Droplets className="w-5 h-5" />
+                <span className="font-medium">Etanol</span>
+              </div>
+              <div className="text-2xl font-bold text-green-700">
+                R$ {singleStation.prices.ethanol.toFixed(2)}
+              </div>
+            </Card>
+
+            <Card className="p-4 bg-gradient-to-br from-amber-50 to-amber-100">
+              <div className="flex items-center gap-2 text-amber-600 mb-2">
+                <Truck className="w-5 h-5" />
+                <span className="font-medium">Diesel</span>
+              </div>
+              <div className="text-2xl font-bold text-amber-700">
+                R$ {singleStation.prices.diesel.toFixed(2)}
+              </div>
+            </Card>
+          </div>
+          
+<div className="w-full h-48 rounded-lg overflow-hidden mt-4 ">
+            <img
+              src={`https://maps.googleapis.com/maps/api/staticmap?center=${singleStation.latitude},${singleStation.longitude}&zoom=15&size=800x400&markers=color:red%7C${singleStation.latitude},${singleStation.longitude}&key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo`}
+              alt="Localização do posto"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <Button 
+            onClick={() => window.open(mapsUrl, '_blank')}
+          >
+            <Navigation className="w-4 h-4 mr-2" />
+            Navegar até o posto
+          </Button>
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-20">
-      <section className="bg-gradient-to-r from-primary to-[#10B981] p-6 -mx-6 -mt-6">
+    <div className="flex flex-col min-h-screen bg-gray-50 w-full max-w-full">
+      <section className="w-full bg-gradient-to-r from-primary to-[#10B981] p-6">
         <div className="flex flex-col gap-4">
-          <h1 className="text-white text-lg font-medium">Postos</h1>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="text-white">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-lg font-bold text-white">Postos de Combustível</h1>
+          </div>
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-white shrink-0" />
             <LocationSelector />
@@ -155,55 +164,73 @@ const Stations = () => {
         </div>
       </section>
 
-      <div className="space-y-4">
-        <div className="flex gap-2">
-          <div className="flex-1">
+      <div className="flex flex-col gap-4 p-4 pb-20 w-full">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-gray-700">Combustível</span>
             <Select value={selectedFuel} onValueChange={setSelectedFuel}>
-              <SelectTrigger className="bg-white">
+              <SelectTrigger>
                 <SelectValue placeholder="Tipo de combustível" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="regular">Gasolina</SelectItem>
+                <SelectItem value="regular">Comum</SelectItem>
+                <SelectItem value="premium">Aditivada</SelectItem>
                 <SelectItem value="ethanol">Etanol</SelectItem>
                 <SelectItem value="diesel">Diesel</SelectItem>
               </SelectContent>
             </Select>
           </div>
-        </div>
 
-        <div className="space-y-4 bg-white p-4 rounded-lg">
-          <div>
-            <label className="text-sm text-gray-500 mb-2 block">Ordenar por</label>
+          <div className="space-y-2">
+            <span className="text-sm font-medium text-gray-700">Ordem</span>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Ordenar por" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="price">Preço</SelectItem>
                 <SelectItem value="distance">Distância</SelectItem>
+                <SelectItem value="price">Preço</SelectItem>
               </SelectContent>
             </Select>
           </div>
+        </div>
 
-          <div>
-            <label className="text-sm text-gray-500 mb-2 block">
-              Distância máxima: {maxDistance}km
-            </label>
+        {location && (
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between">
+              <span className="text-sm text-gray-500">Distância máxima</span>
+              <span className="text-sm font-medium">{maxDistance}km</span>
+            </div>
             <Slider
               value={[maxDistance]}
               onValueChange={([value]) => setMaxDistance(value)}
               max={100}
-              step={1}
+              step={2}
+              className="w-full"
             />
           </div>
-        </div>
-      </div>
+        )}
+        
+        {!location && (
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={getCurrentLocation}
+            disabled={locationLoading}
+          >
+            <MapPin className="w-4 h-4 mr-2" />
+            {locationLoading ? "Obtendo localização..." : "Usar minha localização"}
+          </Button>
+        )}
 
-      <StationsList 
-        stations={processedStations || []} 
-        selectedFuel={selectedFuel}
-        isLoading={isLoading}
-      />
+        {stationsLoading ? (
+          <div className="text-center py-4">Carregando postos...</div>
+        ) : processedStations && processedStations.length > 0 ? (
+          <StationsList stations={processedStations} selectedFuel={selectedFuel} />
+        ) : (
+          <div className="text-center py-4">Nenhum posto encontrado</div>
+        )}
+      </div>
     </div>
   );
 };

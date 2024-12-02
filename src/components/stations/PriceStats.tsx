@@ -43,18 +43,18 @@ export const PriceStats = ({ stations, selectedFuel }: PriceStatsProps) => {
           <p className="font-medium text-green-700">{formatCurrency(minPrice)}</p>
         </div>
       </Card>
-      <Card className="p-4 bg-gradient-to-br from-red-50 to-white">
-        <div className="flex flex-col items-center gap-1">
-          <TrendingUp className="w-5 h-5 text-red-600" />
-          <p className="text-xs text-gray-600">Maior</p>
-          <p className="font-medium text-red-700">{formatCurrency(maxPrice)}</p>
-        </div>
-      </Card>
       <Card className="p-4 bg-gradient-to-br from-blue-50 to-white">
         <div className="flex flex-col items-center gap-1">
           <ArrowRightLeft className="w-5 h-5 text-blue-600" />
           <p className="text-xs text-gray-600">Diferença</p>
           <p className="font-medium text-blue-700">{formatCurrency(difference)}</p>
+        </div>
+      </Card>
+      <Card className="p-4 bg-gradient-to-br from-red-50 to-white">
+        <div className="flex flex-col items-center gap-1">
+          <TrendingUp className="w-5 h-5 text-red-600" />
+          <p className="text-xs text-gray-600">Maior</p>
+          <p className="font-medium text-red-700">{formatCurrency(maxPrice)}</p>
         </div>
       </Card>
     </div>

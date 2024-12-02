@@ -18,77 +18,109 @@ export interface Station {
     diesel: number;
     updated_at: string;
   };
-  distance: string;
-  lastUpdate: string;
-  calculatedDistance?: number;
+  calculatedDistance: number; // Alterado de number | null para number
 }
 
 export const useStations = () => {
   const { location } = useLocation();
 
   return useQuery({
-    queryKey: ['stations'],
+    queryKey: ['stations', location?.lat, location?.lng],
     queryFn: async () => {
-      const { data: stations, error: stationsError } = await supabase
-        .from('stations')
-        .select('*');
+      console.log('Fetching stations with location:', location);
 
-      if (stationsError) {
-        console.error('Error fetching stations:', stationsError);
-        throw stationsError;
-      }
+      try {
+        // Primeiro, busca todas as estações
+        const { data: stations, error: stationsError } = await supabase
+          .from('stations')
+          .select('*');
 
-      const { data: prices, error: pricesError } = await supabase
-        .from('prices')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (pricesError) {
-        console.error('Error fetching prices:', pricesError);
-        throw pricesError;
-      }
-
-      const latestPrices = prices.reduce((acc: Record<number, any>, price) => {
-        if (!acc[price.station_id] || new Date(price.created_at) > new Date(acc[price.station_id].created_at)) {
-          acc[price.station_id] = price;
-        }
-        return acc;
-      }, {});
-
-      const processedStations = stations?.map((station: any) => {
-        const stationPrices = latestPrices[station.id] || {
-          regular: 0,
-          premium: 0,
-          ethanol: 0,
-          diesel: 0,
-          created_at: new Date().toISOString()
-        };
-
-        let calculatedDistance;
-        if (location) {
-          calculatedDistance = calculateDistance(
-            location.lat,
-            location.lng,
-            station.latitude,
-            station.longitude
-          );
+        if (stationsError) {
+          console.error('Error fetching stations:', stationsError);
+          throw new Error(`Erro ao buscar postos: ${stationsError.message}`);
         }
 
-        return {
-          ...station,
-          prices: {
-            regular: stationPrices.regular || 0,
-            premium: stationPrices.premium || 0,
-            ethanol: stationPrices.ethanol || 0,
-            diesel: stationPrices.diesel || 0,
-            updated_at: stationPrices.created_at
-          },
-          lastUpdate: new Date(stationPrices.created_at).toLocaleString(),
-          calculatedDistance
-        };
-      }) || [];
+        if (!stations || stations.length === 0) {
+          console.log('No stations found in database');
+          return [];
+        }
 
-      return processedStations;
+        console.log(`Found ${stations.length} stations in database`);
+
+        // Depois, busca os preços mais recentes
+        const { data: prices, error: pricesError } = await supabase
+          .from('prices')
+          .select('*')
+          .in('station_id', stations.map(s => s.id))
+          .order('created_at', { ascending: false });
+
+        if (pricesError) {
+          console.error('Error fetching prices:', pricesError);
+          // Não vamos lançar erro aqui, apenas logar e continuar com preços zerados
+          console.log('Continuing with zero prices due to error');
+        }
+
+        // Mesmo sem preços, retornamos as estações
+        const processedStations = stations.map(station => {
+          // Converte as coordenadas para números e valida
+          const latitude = Number(station.latitude);
+          const longitude = Number(station.longitude);
+
+          if (isNaN(latitude) || isNaN(longitude)) {
+            console.warn('Invalid coordinates for station:', station);
+            return null;
+          }
+
+          // Encontra o preço mais recente para esta estação
+          const stationPrices = prices?.find(p => p.station_id === station.id) || {
+            regular: 0,
+            premium: 0,
+            ethanol: 0,
+            diesel: 0,
+            created_at: new Date().toISOString()
+          };
+
+          // Calcula a distância se tivermos a localização do usuário
+          let calculatedDistance: number = 0;
+          if (location?.lat && location?.lng) {
+            try {
+              calculatedDistance = calculateDistance(
+                location.lat,
+                location.lng,
+                latitude,
+                longitude
+              );
+            } catch (error) {
+              console.warn('Error calculating distance for station:', station.name, error);
+            }
+          }
+
+          return {
+            ...station,
+            latitude,
+            longitude,
+            prices: {
+              regular: Number(stationPrices.regular) || 0,
+              premium: Number(stationPrices.premium) || 0,
+              ethanol: Number(stationPrices.ethanol) || 0,
+              diesel: Number(stationPrices.diesel) || 0,
+              updated_at: stationPrices.created_at
+            },
+            calculatedDistance
+          };
+        }).filter(station => station !== null);
+
+        console.log('Processed stations:', processedStations);
+        return processedStations;
+
+      } catch (error) {
+        console.error('Unexpected error in useStations:', error);
+        throw error;
+      }
     },
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchInterval: false,
+    staleTime: Infinity
   });
 };

@@ -1,5 +1,5 @@
 import { Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, getFirstName } from "@/lib/utils";
@@ -7,17 +7,21 @@ import BalanceCard from "@/components/BalanceCard";
 import PremiumCard from "@/components/PremiumCard";
 import ReferralCard from "@/components/ReferralCard";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useStations } from "@/hooks/useStations";
 import { useProfile } from "@/hooks/useProfile";
+import { useLocation } from "@/contexts/LocationContext";
+import { calculateDistance } from "@/utils/distance";
+import { Navigation } from "lucide-react";
 
 const Index = () => {
   const balance = 15.50;
   const pendingBalance = 5.20;
   const { profile } = useProfile();
   const [selectedFuel, setSelectedFuel] = useState(profile?.preferred_fuel_type || 'regular');
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const { location } = useLocation();
   const { data: stations, isLoading } = useStations();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (profile?.preferred_fuel_type) {
@@ -33,30 +37,31 @@ const Index = () => {
   
   const unreadCount = notifications.filter(n => !n.read).length;
   
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.error("Error getting location:", error);
+  // Processa e ordena as estações
+  const processedStations = useMemo(() => {
+    if (!stations) return [];
+    
+    return stations
+      .filter(station => {
+        // Filtra estações sem preço do combustível selecionado
+        const price = station.prices[selectedFuel as keyof typeof station.prices];
+        return price > 0;
+      })
+      .sort((a, b) => {
+        // Primeiro por distância se disponível
+        if (a.calculatedDistance !== null && b.calculatedDistance !== null) {
+          return a.calculatedDistance - b.calculatedDistance;
         }
-      );
-    }
-  }, []);
-
-  // Sort stations by distance
-  const sortedStations = stations?.slice().sort((a, b) => {
-    if (!a.calculatedDistance || !b.calculatedDistance) return 0;
-    return a.calculatedDistance - b.calculatedDistance;
-  }).slice(0, 5); // Only show first 5 stations
+        // Se não tiver distância, ordena por preço
+        const priceA = a.prices[selectedFuel as keyof typeof a.prices] || 0;
+        const priceB = b.prices[selectedFuel as keyof typeof b.prices] || 0;
+        return priceA - priceB;
+      })
+      .slice(0, 5); // Mostra apenas os 5 primeiros
+  }, [stations, selectedFuel]);
 
   return (
-    <div className="flex flex-col gap-6 pb-20">
+    <div className="flex flex-col gap-6 pb-20 px-6 py-6" >
       <section className="bg-gradient-to-r from-primary to-secondary p-6 pt-8 -mx-6 -mt-6">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-white text-xl font-medium">
@@ -91,62 +96,65 @@ const Index = () => {
         <ReferralCard />
       </section>
 
-      <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium">Postos</h2>
-          <Select value={selectedFuel} onValueChange={setSelectedFuel}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="regular">Comum</SelectItem>
-              <SelectItem value="premium">Aditivada</SelectItem>
-            </SelectContent>
-          </Select>
+      <section className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-medium">Postos Próximos</h2>
+            <p className="text-sm text-gray-500">Até 5km de distância</p>
+          </div>
+          <Button variant="ghost" onClick={() => navigate('/stations')}>
+            Ver todos
+          </Button>
         </div>
-        <div className="space-y-3">
-          {sortedStations?.map((station) => {
-            // Remove country from address
-            const formattedAddress = station.address.split(',').slice(0, -1).join(',');
-            
-            return (
-              <Link 
-                key={station.id} 
-                to={`/stations/${station.id}`}
-                className="block"
-              >
-                <Card className="p-4 hover:shadow-md transition-shadow bg-gradient-to-r from-gray-50 to-white">
-                  <div className="flex items-center gap-3">
+
+        {isLoading ? (
+          <div className="text-center py-4">Carregando postos...</div>
+        ) : processedStations.length > 0 ? (
+          <div className="flex flex-col py-4">
+            {processedStations.map((station) => (
+              <Link key={station.id} to={`/stations/${station.id}`}>
+                <Card className="p-4 hover:shadow-md transition-shadow mb-4">
+                  <div className="flex gap-4">
                     <img 
-                      src={station.image_url || '/placeholder.svg'} 
+                      src={station.image_url || 'https://images.unsplash.com/photo-1483058712412-4245e9b90334'} 
                       alt={station.name} 
-                      className="w-10 h-10 object-cover rounded-full"
+                      className="w-16 h-16 object-cover rounded-lg shrink-0"
                     />
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium">{station.name}</p>
-                          <p className="text-xs text-gray-500">{formattedAddress}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <div className="min-w-0">
+                          <h3 className="font-medium truncate">{station.name}</h3>
+                          <p className="text-sm text-gray-500 truncate">{station.address}</p>
+                          {location && typeof station.calculatedDistance === 'number' && (
+                            <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                              <Navigation className="w-3 h-3 shrink-0" />
+                              <span>{station.calculatedDistance.toFixed(1)}km</span>
+                            </div>
+                          )}
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm text-primary font-medium">
-                            {selectedFuel === 'regular' ? 
-                              formatCurrency(station.prices.regular) :
-                              formatCurrency(station.prices.premium)
-                            }
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {station.calculatedDistance ? `${station.calculatedDistance.toFixed(1)}km` : '--'}
-                          </p>
+                        <div className="text-right shrink-0">
+                          {station.prices[selectedFuel] > 0 && (
+                            <div className="text-lg font-bold text-green-600">
+                              R$ {station.prices[selectedFuel].toFixed(2)}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
                 </Card>
               </Link>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-4">
+            Nenhum posto encontrado com {
+              selectedFuel === 'regular' ? 'gasolina comum' :
+              selectedFuel === 'premium' ? 'gasolina aditivada' :
+              selectedFuel === 'ethanol' ? 'etanol' : 'diesel'
+            }
+          </div>
+        )}
       </section>
     </div>
   );

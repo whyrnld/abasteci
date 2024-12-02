@@ -13,20 +13,22 @@ import { useToast } from '@/components/ui/use-toast';
 
 export function LocationSelector() {
   const [isOpen, setIsOpen] = useState(false);
-  const [address, setAddress] = useState('');
-  const { location, getCurrentLocation, updateLocation } = useLocation();
+  const [cep, setCep] = useState('');
+  const { location, isLoading, getCurrentLocation, updateLocation } = useLocation();
   const { toast } = useToast();
 
-  // Remove country from address
-  const formattedAddress = location?.address ? location.address.split(',').slice(0, -1).join(',') : 'Carregando localização...';
+  const handleCepSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Implementar busca por CEP
+  };
 
   const handleManualLocation = async () => {
-    if (!address) return;
+    if (!cep) return;
 
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-          address
+          cep
         )}&key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo`
       );
 
@@ -53,9 +55,26 @@ export function LocationSelector() {
   return (
     <div className="flex items-center gap-2 max-w-[calc(100vw-120px)]">
       <div className="flex-1 flex items-center gap-2 min-w-0">
-        <p className="text-white text-sm truncate">
-          {formattedAddress}
-        </p>
+        {isLoading ? (
+          <div className="text-white text-sm">Obtendo localização...</div>
+        ) : location ? (
+          <div className="text-white text-sm truncate">
+            {location.address || `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`}
+          </div>
+        ) : (
+          <form onSubmit={handleCepSubmit} className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Digite seu CEP"
+              value={cep}
+              onChange={(e) => setCep(e.target.value)}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+            />
+            <Button type="submit" variant="secondary" size="sm">
+              Buscar
+            </Button>
+          </form>
+        )}
         <Button
           variant="ghost"
           size="sm"
@@ -89,8 +108,8 @@ export function LocationSelector() {
                 <p className="text-sm font-medium">Alterar localização</p>
                 <Input
                   placeholder="Digite o CEP"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  value={cep}
+                  onChange={(e) => setCep(e.target.value)}
                 />
                 <Button onClick={handleManualLocation} className="w-full">
                   Confirmar
