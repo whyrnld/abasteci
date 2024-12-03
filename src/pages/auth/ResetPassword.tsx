@@ -28,15 +28,30 @@ const ResetPassword = () => {
         description: errorDescription?.replace(/\+/g, ' ') || "Link inválido ou expirado",
       });
       navigate("/auth/login");
+      return;
     }
 
     // If we have an access token, we can proceed with the password reset
     if (accessToken) {
-      // Set the session with the access token
       supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: "",
+      }).catch((error) => {
+        console.error("Error setting session:", error);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Não foi possível validar sua sessão. Tente novamente.",
+        });
+        navigate("/auth/login");
       });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Link inválido ou expirado",
+      });
+      navigate("/auth/login");
     }
   }, [navigate, toast]);
 
@@ -57,6 +72,7 @@ const ResetPassword = () => {
       });
       navigate("/auth/login");
     } catch (error: any) {
+      console.error("Error updating password:", error);
       toast({
         variant: "destructive",
         title: "Erro",
