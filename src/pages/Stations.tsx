@@ -140,7 +140,7 @@ const Stations = () => {
             onClick={() => window.open(mapsUrl, '_blank')}
           >
             <Navigation className="w-4 h-4 mr-2" />
-            Navegar até o posto
+            Traçar rota até o posto
           </Button>
         </div>
       </div>

@@ -67,15 +67,15 @@ const Index = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col">
             <img src="/abasteci.svg"  alt="abasteci" className="h-8 mb-2" />
-            <h2 className="text-white text-sm font-medium text-green-800 mt-2 mb-2">
+            {/* <h2 className="text-white text-sm font-medium text-green-800 mt-2 mb-2">
               Olá, {profile ? getFirstName(profile.full_name) : "" } 🫡
-            </h2>
+            </h2> */}
           </div>
           <Link to="/notifications" className="relative">
-            <Button variant="ghost" size="icon" className="text-green-500 hover:text-white/80">
+            <Button variant="ghost" size="icon" className="text-green-800 ">
               <Bell className="h-6 w-6" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full">
+                <span className="absolute -top-1 -right-1 bg-green-700 text-white text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full">
                   {unreadCount}
                 </span>
               )}
