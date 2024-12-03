@@ -1,4 +1,4 @@
-import { Bell } from "lucide-react";
+import { Bell, PiggyBank } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -63,19 +63,19 @@ const Index = () => {
 
   return (
     <div className="flex flex-col gap-6 pb-20 px-6 py-6" >
-      <section className="bg-gradient-to-r from-green-200 to-teal-300 p-6 pt-8 -mx-6 -mt-6">
+      <section className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 pt-8 -mx-6 -mt-6 rounded-b-2xl">
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col">
-            <img src="/abasteci.svg" alt="abasteci" className="h-8 mb-2" />
-            <h2 className="text-white text-sm font-medium text-green-800 ">
-              Olá, {profile ? getFirstName(profile.full_name) : "" } 👋
+            <img src="/abasteci.svg"  alt="abasteci" className="h-8 mb-2" />
+            <h2 className="text-white text-sm font-medium text-green-800 mt-2 mb-2">
+              Olá, {profile ? getFirstName(profile.full_name) : "" } 🫡
             </h2>
           </div>
           <Link to="/notifications" className="relative">
-            <Button variant="ghost" size="icon" className="text-white hover:text-white/80">
+            <Button variant="ghost" size="icon" className="text-green-500 hover:text-white/80">
               <Bell className="h-6 w-6" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-white text-primary text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full">
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full">
                   {unreadCount}
                 </span>
               )}
@@ -85,10 +85,13 @@ const Index = () => {
         <BalanceCard balance={balance} pendingBalance={pendingBalance} />
       </section>
 
-      <Card className="p-6 bg-gradient-to-br from-accent to-white border-2 border-primary/20">
-        <h2 className="text-xl font-semibold text-secondary mb-2">
-          Economize em seus abastecimentos!
+      <Card className="p-6 bg-gradient-to-br from-cyan-50 to-sky-100 border-1,5 border-sky-200">
+      <div className="flex items-start gap-4 mb-4">
+      <PiggyBank className="w-6 h-6" />
+        <h2 className="text-lg font-semibold text-blue-950 mb-2">
+          Economize nos abastecimentos!
         </h2>
+        </div>
         <p className="text-gray-700 text-sm leading-relaxed">
           Compare preços dos postos próximos a você e ganhe cashback ao enviar suas notas fiscais. 
           Abasteça mais pagando menos e ainda receba dinheiro de volta!
@@ -120,7 +123,7 @@ const Index = () => {
                 key={station.id}
                 station={station}
                 selectedFuel={selectedFuel}
-                className="mb-4"
+                className="mb-2"
               />
             ))}
           </div>
