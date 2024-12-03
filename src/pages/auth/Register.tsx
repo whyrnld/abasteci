@@ -44,7 +44,7 @@ const Register = () => {
 
     try {
       const { data, error } = await supabase.auth.signUp({
-        email: `${formData.cpf}@fuelfolio.app`,
+        email: formData.email,
         password: formData.password,
         options: {
           data: {
@@ -52,6 +52,7 @@ const Register = () => {
             cpf: formData.cpf,
             phone: formData.phone,
             birth_date: formData.birthDate,
+            email: formData.email,
           },
         },
       });
@@ -96,6 +97,20 @@ const Register = () => {
                 onChange={handleChange}
                 className="mt-2"
                 placeholder="Digite seu nome completo"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email">E-mail</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="mt-2"
+                placeholder="Digite seu e-mail"
               />
             </div>
 

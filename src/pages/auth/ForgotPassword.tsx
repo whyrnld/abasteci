@@ -5,10 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
-import { maskCPF } from "@/lib/utils";
 
 const ForgotPassword = () => {
-  const [cpf, setCpf] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -18,10 +17,7 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const cleanCPF = cpf.replace(/\D/g, "");
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        `${cleanCPF}@fuelfolio.app`
-      );
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
 
       if (error) throw error;
 
@@ -51,15 +47,15 @@ const ForgotPassword = () => {
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
-              <Label htmlFor="cpf">CPF</Label>
+              <Label htmlFor="email">E-mail</Label>
               <Input
-                id="cpf"
-                type="text"
+                id="email"
+                type="email"
                 required
-                value={maskCPF(cpf)}
-                onChange={(e) => setCpf(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="mt-2"
-                placeholder="000.000.000-00"
+                placeholder="Digite seu e-mail"
               />
             </div>
 

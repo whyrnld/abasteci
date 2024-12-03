@@ -1,22 +1,15 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Bell, LogOut, Sliders } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
+import { LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { useProfile } from "@/hooks/useProfile";
+import { ProfileSection } from "@/components/settings/ProfileSection";
+import { PixSection } from "@/components/settings/PixSection";
+import { PreferencesSection } from "@/components/settings/PreferencesSection";
+import { NotificationsSection } from "@/components/settings/NotificationsSection";
 
 const Settings = () => {
   const [preferredFuel, setPreferredFuel] = useState("regular");
@@ -81,111 +74,30 @@ const Settings = () => {
       </section>
 
       <div className="space-y-4">
-        <Card className="p-4">
-          <h3 className="font-medium mb-4">Perfil</h3>
-          <div className="space-y-2">
-            <p className="text-sm text-gray-500">Nome: {profile?.full_name}</p>
-            <p className="text-sm text-gray-500">CPF: {profile?.cpf}</p>
-            <p className="text-sm text-gray-500">Telefone: {profile?.phone}</p>
-          </div>
-        </Card>
+        <ProfileSection />
+        
+        <PixSection
+          defaultPixKey={defaultPixKey}
+          defaultPixKeyType={defaultPixKeyType}
+          setDefaultPixKey={setDefaultPixKey}
+          setDefaultPixKeyType={setDefaultPixKeyType}
+          handleSavePreferences={handleSavePreferences}
+        />
 
-        <Card className="p-4">
-          <h3 className="font-medium mb-4">Chave PIX Padrão</h3>
-          <div className="space-y-4">
-            <div>
-              <Label>Tipo de Chave</Label>
-              <Select value={defaultPixKeyType} onValueChange={setDefaultPixKeyType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cpf">CPF</SelectItem>
-                  <SelectItem value="email">Email</SelectItem>
-                  <SelectItem value="phone">Celular</SelectItem>
-                  <SelectItem value="random">Chave Aleatória</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Chave PIX</Label>
-              <Input
-                value={defaultPixKey}
-                onChange={(e) => setDefaultPixKey(e.target.value)}
-                placeholder="Digite sua chave PIX"
-              />
-            </div>
-            <Button onClick={handleSavePreferences} className="w-full">
-              Salvar Chave PIX
-            </Button>
-          </div>
-        </Card>
+        <PreferencesSection
+          preferredFuel={preferredFuel}
+          searchRadius={searchRadius}
+          setPreferredFuel={setPreferredFuel}
+          setSearchRadius={setSearchRadius}
+          handleSavePreferences={handleSavePreferences}
+        />
 
-        <Card className="p-4">
-          <h3 className="font-medium mb-4 flex items-center gap-2">
-            <Sliders className="w-5 h-5" />
-            Preferências
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-500 mb-2 block">
-                Combustível preferido
-              </label>
-              <Select value={preferredFuel} onValueChange={setPreferredFuel}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="regular">Gasolina Comum</SelectItem>
-                  <SelectItem value="premium">Gasolina Premium</SelectItem>
-                  <SelectItem value="ethanol">Etanol</SelectItem>
-                  <SelectItem value="diesel">Diesel</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm text-gray-500 mb-2 block">
-                Raio de busca: {searchRadius}km
-              </label>
-              <Slider
-                value={[searchRadius]}
-                onValueChange={([value]) => setSearchRadius(value)}
-                max={100}
-                step={1}
-              />
-            </div>
-            <Button onClick={handleSavePreferences} className="w-full">
-              Salvar Preferências
-            </Button>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <h3 className="font-medium mb-4 flex items-center gap-2">
-            <Bell className="w-5 h-5" />
-            Notificações
-          </h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-sm text-gray-500">
-                Atualizações de preço
-              </label>
-              <Switch
-                checked={priceAlerts}
-                onCheckedChange={setPriceAlerts}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="text-sm text-gray-500">
-                Status do recibo
-              </label>
-              <Switch
-                checked={receiptAlerts}
-                onCheckedChange={setReceiptAlerts}
-              />
-            </div>
-          </div>
-        </Card>
+        <NotificationsSection
+          priceAlerts={priceAlerts}
+          receiptAlerts={receiptAlerts}
+          setPriceAlerts={setPriceAlerts}
+          setReceiptAlerts={setReceiptAlerts}
+        />
 
         <Button 
           variant="destructive" 
