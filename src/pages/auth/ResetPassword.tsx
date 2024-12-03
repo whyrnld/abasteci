@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,23 +13,42 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [searchParams] = useSearchParams();
+
+  // Get the token from the URL hash
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const error = hashParams.get("error");
+    const errorDescription = hashParams.get("error_description");
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: errorDescription?.replace(/\+/g, ' ') || "Link inválido ou expirado",
+      });
+      navigate("/auth/login");
+    }
+  }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Get the token from the URL
-      const token = searchParams.get("token");
+      // Get the token from the URL query parameters
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+      const type = params.get("type");
       
-      if (!token) {
-        throw new Error("Token de redefinição não encontrado");
+      if (!token || type !== "recovery") {
+        throw new Error("Token de redefinição não encontrado ou inválido");
       }
 
-      // Update the user's password using the token from the URL
-      const { error } = await supabase.auth.updateUser({
-        password: password,
+      // Update the user's password using the recovery token
+      const { error } = await supabase.auth.verifyOtp({
+        token,
+        type: "recovery",
+        newPassword: password,
       });
 
       if (error) throw error;
