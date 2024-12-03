@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,12 +13,21 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Get the token from the URL
+      const token = searchParams.get("token");
+      
+      if (!token) {
+        throw new Error("Token de redefinição não encontrado");
+      }
+
+      // Update the user's password using the token from the URL
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
@@ -27,14 +36,14 @@ const ResetPassword = () => {
 
       toast({
         title: "Senha atualizada!",
-        description: "Sua senha foi alterada com sucesso.",
+        description: "Sua senha foi alterada com sucesso. Você já pode fazer login.",
       });
       navigate("/auth/login");
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Não foi possível alterar sua senha.",
+        description: error.message || "Não foi possível alterar sua senha.",
       });
     } finally {
       setLoading(false);
