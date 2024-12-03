@@ -9,6 +9,7 @@ interface Profile {
   cpf: string;
   phone: string;
   birth_date: string;
+  email: string | null;
   preferred_fuel_type?: string;
   search_radius?: number;
   pix_key?: string;
