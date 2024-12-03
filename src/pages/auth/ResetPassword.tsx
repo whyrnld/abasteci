@@ -17,6 +17,7 @@ const ResetPassword = () => {
   // Get the token from the URL hash
   useEffect(() => {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get("access_token");
     const error = hashParams.get("error");
     const errorDescription = hashParams.get("error_description");
 
@@ -28,6 +29,15 @@ const ResetPassword = () => {
       });
       navigate("/auth/login");
     }
+
+    // If we have an access token, we can proceed with the password reset
+    if (accessToken) {
+      // Set the session with the access token
+      supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: "",
+      });
+    }
   }, [navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,16 +45,6 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      // Get the token from the URL query parameters
-      const params = new URLSearchParams(window.location.search);
-      const token = params.get("token");
-      const type = params.get("type");
-      
-      if (!token || type !== "recovery") {
-        throw new Error("Token de redefinição não encontrado ou inválido");
-      }
-
-      // Update the user's password using the recovery token
       const { error } = await supabase.auth.updateUser({
         password: password
       });
