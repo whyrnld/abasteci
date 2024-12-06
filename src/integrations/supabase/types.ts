@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      brands: {
+        Row: {
+          created_at: string
+          id: number
+          image_url: string | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          image_url?: string | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          image_url?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
       prices: {
         Row: {
           created_at: string
@@ -146,6 +167,7 @@ export type Database = {
       stations: {
         Row: {
           address: string
+          brand_id: number | null
           cnpj: string | null
           created_at: string
           id: number
@@ -156,6 +178,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          brand_id?: number | null
           cnpj?: string | null
           created_at?: string
           id?: number
@@ -166,6 +189,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          brand_id?: number | null
           cnpj?: string | null
           created_at?: string
           id?: number
@@ -174,7 +198,47 @@ export type Database = {
           longitude?: number
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "stations_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          id: number
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: never
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: never
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

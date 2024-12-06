@@ -11,24 +11,53 @@ import { useState, useEffect, useMemo } from "react";
 import { useStations } from "@/hooks/useStations";
 import { useProfile } from "@/hooks/useProfile";
 import { useLocation } from "@/contexts/LocationContext";
-import { calculateDistance } from "@/utils/distance";
-import { Navigation } from "lucide-react";
 import { StationCard } from "@/components/stations/StationCard";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
-  const balance = 15.50;
-  const pendingBalance = 5.20;
+  const { user } = useAuth();
   const { profile } = useProfile();
   const [selectedFuel, setSelectedFuel] = useState(profile?.preferred_fuel_type || 'regular');
   const { location } = useLocation();
   const { data: stations, isLoading } = useStations();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (profile?.preferred_fuel_type) {
-      setSelectedFuel(profile.preferred_fuel_type);
-    }
-  }, [profile]);
+  // Fetch wallet balance
+  const { data: wallet } = useQuery({
+    queryKey: ['wallet', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('profile_id', user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Fetch pending receipts total
+  const { data: pendingTotal } = useQuery({
+    queryKey: ['pending-receipts', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data, error } = await supabase
+        .from('receipts')
+        .select('amount')
+        .eq('user_id', user.id)
+        .eq('status', 'processing');
+
+      if (error) throw error;
+      // Calculate total pending amount (R$0.20 per receipt)
+      return (data?.length || 0) * 0.20;
+    },
+    enabled: !!user?.id,
+  });
 
   // Mock notifications data - In a real app, this would come from an API
   const notifications = [
@@ -38,27 +67,24 @@ const Index = () => {
   
   const unreadCount = notifications.filter(n => !n.read).length;
   
-  // Processa e ordena as estações
+  // Process and sort stations
   const processedStations = useMemo(() => {
     if (!stations) return [];
     
     return stations
       .filter(station => {
-        // Filtra estações sem preço do combustível selecionado
         const price = station.prices[selectedFuel as keyof typeof station.prices];
         return price > 0;
       })
       .sort((a, b) => {
-        // Primeiro por distância se disponível
         if (a.calculatedDistance !== null && b.calculatedDistance !== null) {
           return a.calculatedDistance - b.calculatedDistance;
         }
-        // Se não tiver distância, ordena por preço
         const priceA = a.prices[selectedFuel as keyof typeof a.prices] || 0;
         const priceB = b.prices[selectedFuel as keyof typeof b.prices] || 0;
         return priceA - priceB;
       })
-      .slice(0, 5); // Mostra apenas os 5 primeiros
+      .slice(0, 5);
   }, [stations, selectedFuel]);
 
   return (
@@ -67,9 +93,6 @@ const Index = () => {
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col">
             <img src="/abasteci.svg"  alt="abasteci" className="h-8 mb-2" />
-            {/* <h2 className="text-white text-sm font-medium text-green-800 mt-2 mb-2">
-              Olá, {profile ? getFirstName(profile.full_name) : "" } 🫡
-            </h2> */}
           </div>
           <Link to="/notifications" className="relative">
             <Button variant="ghost" size="icon" className="text-green-800 ">
@@ -82,7 +105,10 @@ const Index = () => {
             </Button>
           </Link>
         </div>
-        <BalanceCard balance={balance} pendingBalance={pendingBalance} />
+        <BalanceCard 
+          balance={wallet?.balance || 0} 
+          pendingBalance={pendingTotal || 0} 
+        />
       </section>
 
       <Card className="p-6 bg-gradient-to-br from-cyan-50 to-sky-100 border-1,5 border-sky-200">
