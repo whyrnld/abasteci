@@ -3,15 +3,43 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, Wallet } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Balance = () => {
-  const balance = 15.50;
-  const withdrawals = [
-    { id: 1, amount: 50.00, date: "10/03/2024", status: "completed" },
-    { id: 2, amount: 30.00, date: "05/03/2024", status: "processing" },
-  ];
-
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { data: walletData } = useQuery({
+    queryKey: ['wallet', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('profile_id', user?.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
+
+  const { data: withdrawals } = useQuery({
+    queryKey: ['withdrawals', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('withdrawals')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
 
   return (
     <div className="flex flex-col gap-6 pb-20 px-6 py-6">
@@ -26,13 +54,14 @@ const Balance = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-sm text-gray-500">Saldo disponível</p>
-            <p className="text-2xl font-bold">{formatCurrency(balance)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(walletData?.balance || 0)}</p>
           </div>
           <Wallet className="w-8 h-8 text-primary" />
         </div>
         <Button 
           className="w-full"
           onClick={() => navigate('/withdrawal-request')}
+          disabled={!walletData?.balance || walletData.balance <= 0}
         >
           Solicitar saque
         </Button>
@@ -41,17 +70,28 @@ const Balance = () => {
       <div>
         <h2 className="text-lg font-medium mb-4">Histórico de saques</h2>
         <div className="space-y-3">
-          {withdrawals.map((withdrawal) => (
+          {withdrawals?.map((withdrawal) => (
             <Card key={withdrawal.id} className="p-4">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-medium">{formatCurrency(withdrawal.amount)}</p>
-                  <p className="text-sm text-gray-500">{withdrawal.date}</p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(withdrawal.created_at).toLocaleDateString()}
+                  </p>
                 </div>
-                <span className="text-sm capitalize">{withdrawal.status}</span>
+                <span className={`text-sm capitalize ${
+                  withdrawal.status === 'pending' ? 'text-yellow-600' : 
+                  withdrawal.status === 'completed' ? 'text-green-600' : 
+                  'text-red-600'
+                }`}>
+                  {withdrawal.status}
+                </span>
               </div>
             </Card>
           ))}
+          {(!withdrawals || withdrawals.length === 0) && (
+            <p className="text-center text-gray-500">Nenhum saque realizado</p>
+          )}
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ export interface Station {
   longitude: number;
   cnpj: string | null;
   image_url: string | null;
+  brand_id: number | null;
   prices: {
     regular: number;
     premium: number;
@@ -18,7 +19,7 @@ export interface Station {
     diesel: number;
     updated_at: string;
   };
-  calculatedDistance: number; // Alterado de number | null para number
+  calculatedDistance: number;
 }
 
 export const useStations = () => {

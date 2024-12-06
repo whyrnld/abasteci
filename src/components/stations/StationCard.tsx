@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import type { Station } from "@/hooks/useStations";
 import { useLocation } from "@/contexts/LocationContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 interface StationCardProps {
   station: Station;
@@ -12,6 +14,22 @@ interface StationCardProps {
 export const StationCard: React.FC<StationCardProps> = ({ station, selectedFuel, className = "" }) => {
   const { location } = useLocation();
 
+  const { data: brand } = useQuery({
+    queryKey: ['brand', station.brand_id],
+    queryFn: async () => {
+      if (!station.brand_id) return null;
+      const { data, error } = await supabase
+        .from('brands')
+        .select('*')
+        .eq('id', station.brand_id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!station.brand_id
+  });
+
   // Get the price for the selected fuel type and ensure it's a number
   const price = Number(station.prices[selectedFuel as keyof typeof station.prices]) || 0;
 
@@ -20,7 +38,7 @@ export const StationCard: React.FC<StationCardProps> = ({ station, selectedFuel,
       <Card className={`p-4 hover:shadow-md transition-shadow w-full ${className}`}>
         <div className="flex gap-4 w-full">
           <img 
-            src={station.image_url || 'https://cdn1.iconfinder.com/data/icons/prettyoffice8/256/Gas-pump.png'} 
+            src={brand?.image_url || 'https://cdn1.iconfinder.com/data/icons/prettyoffice8/256/Gas-pump.png'} 
             alt={station.name} 
             className="w-20 h-20 object-cover rounded-lg shrink-0"
           />
