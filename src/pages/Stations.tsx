@@ -9,6 +9,8 @@ import { useLocation } from "@/contexts/LocationContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 const Stations = () => {
   const [selectedFuel, setSelectedFuel] = useState("regular");
@@ -48,6 +50,22 @@ const Stations = () => {
     const singleStation = stations.find(s => s.id.toString() === id);
     if (!singleStation) return null;
 
+    const { data: brand } = useQuery({
+      queryKey: ['brand', singleStation.brand_id],
+      queryFn: async () => {
+        if (!singleStation.brand_id) return null;
+        const { data, error } = await supabase
+          .from('brands')
+          .select('*')
+          .eq('id', singleStation.brand_id)
+          .single();
+
+        if (error) throw error;
+        return data;
+      },
+      enabled: !!singleStation.brand_id
+    });
+
     const drivingTimeMinutes = calculateDrivingTime(singleStation.calculatedDistance || 0);
     const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${singleStation.latitude},${singleStation.longitude}`;
 
@@ -65,7 +83,7 @@ const Stations = () => {
         <div className="flex flex-col gap-4 p-4 pb-20 w-full">
           <div className="flex gap-4 items-start">
             <img 
-              src={singleStation.image_url || 'https://cdn1.iconfinder.com/data/icons/prettyoffice8/256/Gas-pump.png'} 
+              src={brand?.image_url || 'https://cdn1.iconfinder.com/data/icons/prettyoffice8/256/Gas-pump.png'} 
               alt={singleStation.name} 
               className="w-20 h-20 object-cover rounded-lg"
             />
@@ -129,7 +147,7 @@ const Stations = () => {
             </Card>
           </div>
           
-<div className="w-full h-48 rounded-lg overflow-hidden mt-4 ">
+          <div className="w-full h-48 rounded-lg overflow-hidden mt-4 ">
             <img
               src={`https://maps.googleapis.com/maps/api/staticmap?center=${singleStation.latitude},${singleStation.longitude}&zoom=15&size=800x400&markers=color:red%7C${singleStation.latitude},${singleStation.longitude}&key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo`}
               alt="Localização do posto"

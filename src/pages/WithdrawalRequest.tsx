@@ -28,7 +28,7 @@ const WithdrawalRequest = () => {
     }
   }, [profile]);
 
-  const { data: wallet } = useQuery({
+  const { data: wallet, refetch: refetchWallet } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -81,6 +81,17 @@ const WithdrawalRequest = () => {
     }
 
     try {
+      // Start a transaction to update both wallet and create withdrawal
+      const { error: walletError } = await supabase
+        .from('wallets')
+        .update({ 
+          balance: wallet.balance - withdrawalAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('profile_id', user?.id);
+
+      if (walletError) throw walletError;
+
       // Create withdrawal request
       const { error: withdrawalError } = await supabase
         .from('withdrawals')
@@ -93,13 +104,7 @@ const WithdrawalRequest = () => {
 
       if (withdrawalError) throw withdrawalError;
 
-      // Update wallet balance
-      const { error: walletError } = await supabase
-        .from('wallets')
-        .update({ balance: wallet.balance - withdrawalAmount })
-        .eq('profile_id', user?.id);
-
-      if (walletError) throw walletError;
+      await refetchWallet();
 
       toast({
         title: "Solicitação enviada",

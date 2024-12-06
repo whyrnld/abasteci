@@ -48,6 +48,10 @@ export const useReceipts = () => {
         .single();
 
       if (error) throw error;
+
+      // Invalidate wallet query to refresh balance
+      queryClient.invalidateQueries({ queryKey: ['wallet', user.id] });
+
       return data;
     },
     onSuccess: () => {
