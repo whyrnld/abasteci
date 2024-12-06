@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { ArrowLeft, Wallet } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -71,23 +71,25 @@ const Balance = () => {
         <h2 className="text-lg font-medium mb-4">Histórico de saques</h2>
         <div className="space-y-3">
           {withdrawals?.map((withdrawal) => (
-            <Card key={withdrawal.id} className="p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{formatCurrency(withdrawal.amount)}</p>
-                  <p className="text-sm text-gray-500">
-                    {new Date(withdrawal.created_at).toLocaleDateString()}
-                  </p>
+            <Link key={withdrawal.id} to={`/withdrawals/${withdrawal.id}`}>
+              <Card className="p-4 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{formatCurrency(withdrawal.amount)}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(withdrawal.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span className={`text-sm capitalize ${
+                    withdrawal.status === 'pending' ? 'text-yellow-600' : 
+                    withdrawal.status === 'completed' ? 'text-green-600' : 
+                    'text-red-600'
+                  }`}>
+                    {withdrawal.status}
+                  </span>
                 </div>
-                <span className={`text-sm capitalize ${
-                  withdrawal.status === 'pending' ? 'text-yellow-600' : 
-                  withdrawal.status === 'completed' ? 'text-green-600' : 
-                  'text-red-600'
-                }`}>
-                  {withdrawal.status}
-                </span>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           ))}
           {(!withdrawals || withdrawals.length === 0) && (
             <p className="text-center text-gray-500">Nenhum saque realizado</p>

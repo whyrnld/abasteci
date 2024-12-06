@@ -10,6 +10,7 @@ import ReceiptDetails from "./pages/ReceiptDetails";
 import Premium from "./pages/Premium";
 import Referral from "./pages/Referral";
 import WithdrawalRequest from "./pages/WithdrawalRequest";
+import WithdrawalDetails from "./pages/WithdrawalDetails";
 import Notifications from "./pages/Notifications";
 import NotificationDetails from "./pages/NotificationDetails";
 import Login from "./pages/auth/Login";
@@ -167,6 +168,14 @@ export const AppRoutes = () => (
       element={
         <PrivateRoute>
           <WithdrawalRequest />
+        </PrivateRoute>
+      }
+    />
+    <Route
+      path="/withdrawals/:id"
+      element={
+        <PrivateRoute>
+          <WithdrawalDetails />
         </PrivateRoute>
       }
     />

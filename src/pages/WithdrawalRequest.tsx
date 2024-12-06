@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,14 +10,23 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
+import { useProfile } from "@/hooks/useProfile";
 
 const WithdrawalRequest = () => {
-  const [pixKeyType, setPixKeyType] = useState("cpf");
-  const [pixKey, setPixKey] = useState("");
+  const { profile } = useProfile();
+  const [pixKeyType, setPixKeyType] = useState(profile?.pix_key_type || "cpf");
+  const [pixKey, setPixKey] = useState(profile?.pix_key || "");
   const [amount, setAmount] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (profile) {
+      setPixKeyType(profile.pix_key_type || "cpf");
+      setPixKey(profile.pix_key || "");
+    }
+  }, [profile]);
 
   const { data: wallet } = useQuery({
     queryKey: ['wallet', user?.id],
