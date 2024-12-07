@@ -2,11 +2,10 @@ import { Bell, PiggyBank } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { formatCurrency, getFirstName } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import BalanceCard from "@/components/BalanceCard";
 import PremiumCard from "@/components/PremiumCard";
 import ReferralCard from "@/components/ReferralCard";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useMemo } from "react";
 import { useStations } from "@/hooks/useStations";
 import { useProfile } from "@/hooks/useProfile";
@@ -15,6 +14,8 @@ import { StationCard } from "@/components/stations/StationCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+
+const MAX_DISTANCE = 5; // 5km maximum distance
 
 const Index = () => {
   const { user } = useAuth();
@@ -53,7 +54,6 @@ const Index = () => {
         .eq('status', 'processing');
 
       if (error) throw error;
-      // Calculate total pending amount (R$0.20 per receipt)
       return (data?.length || 0) * 0.20;
     },
     enabled: !!user?.id,
@@ -74,7 +74,8 @@ const Index = () => {
     return stations
       .filter(station => {
         const price = station.prices[selectedFuel as keyof typeof station.prices];
-        return price > 0;
+        const isWithinRange = station.calculatedDistance <= MAX_DISTANCE;
+        return price > 0 && isWithinRange;
       })
       .sort((a, b) => {
         if (a.calculatedDistance !== null && b.calculatedDistance !== null) {
@@ -112,11 +113,11 @@ const Index = () => {
       </section>
 
       <Card className="p-6 bg-gradient-to-br from-cyan-50 to-sky-100 border-1,5 border-sky-200">
-      <div className="flex items-start gap-4 mb-4">
-      <PiggyBank className="w-6 h-6" />
-        <h2 className="text-lg font-semibold text-blue-950 mb-2">
-          Economize nos abastecimentos!
-        </h2>
+        <div className="flex items-start gap-4 mb-4">
+          <PiggyBank className="w-6 h-6" />
+          <h2 className="text-lg font-semibold text-blue-950 mb-2">
+            Economize nos abastecimentos!
+          </h2>
         </div>
         <p className="text-gray-700 text-sm leading-relaxed">
           Compare preços dos postos próximos a você e ganhe cashback ao enviar suas notas fiscais. 
@@ -125,7 +126,7 @@ const Index = () => {
       </Card>
 
       <section className="space-y-4">
-        <PremiumCard />
+        {!profile?.is_premium && <PremiumCard />}
         <ReferralCard />
       </section>
 
@@ -133,7 +134,7 @@ const Index = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-medium">Postos Próximos</h2>
-            <p className="text-sm text-gray-500">Até 5km de distância</p>
+            <p className="text-sm text-gray-500">Até {MAX_DISTANCE}km de distância</p>
           </div>
           <Button variant="ghost" onClick={() => navigate('/stations')}>
             Ver todos
@@ -154,12 +155,11 @@ const Index = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-4">
-            Nenhum posto encontrado com {
-              selectedFuel === 'regular' ? 'gasolina comum' :
-              selectedFuel === 'premium' ? 'gasolina aditivada' :
-              selectedFuel === 'ethanol' ? 'etanol' : 'diesel'
-            }
+          <div className="text-center py-4 space-y-4">
+            <p className="text-gray-500">Nenhum posto encontrado próximo a você</p>
+            <Button onClick={() => navigate('/stations')}>
+              Ver todos os postos
+            </Button>
           </div>
         )}
       </section>

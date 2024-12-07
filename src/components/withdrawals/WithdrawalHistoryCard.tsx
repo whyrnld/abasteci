@@ -12,7 +12,15 @@ const WithdrawalHistoryCard = ({ amount, date, status }: WithdrawalHistoryCardPr
   const statusColors = {
     pending: "bg-yellow-500",
     completed: "bg-green-500",
+    approved: "bg-green-500",
     failed: "bg-red-500"
+  };
+
+  const textColors = {
+    pending: "text-yellow-600",
+    completed: "text-green-600",
+    approved: "text-green-600",
+    failed: "text-red-600"
   };
 
   return (
@@ -29,9 +37,7 @@ const WithdrawalHistoryCard = ({ amount, date, status }: WithdrawalHistoryCardPr
           </div>
           <span className={cn(
             "text-sm capitalize",
-            status === 'pending' ? 'text-yellow-600' :
-            status === 'completed' ? 'text-green-600' :
-            'text-red-600'
+            textColors[status as keyof typeof textColors] || "text-gray-600"
           )}>
             {status}
           </span>
