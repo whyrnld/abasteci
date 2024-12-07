@@ -30,6 +30,131 @@ export type Database = {
         }
         Relationships: []
       }
+      favorite_stations: {
+        Row: {
+          created_at: string
+          id: number
+          station_id: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          station_id: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          station_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorite_stations_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorite_stations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: number
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_alerts: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          fuel_type: string
+          id: number
+          station_id: number
+          target_price: number
+          triggered_at: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          fuel_type: string
+          id?: number
+          station_id: number
+          target_price: number
+          triggered_at?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          fuel_type?: string
+          id?: number
+          station_id?: number
+          target_price?: number
+          triggered_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_alerts_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "stations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prices: {
         Row: {
           created_at: string

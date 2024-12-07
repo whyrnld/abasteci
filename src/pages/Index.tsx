@@ -6,7 +6,7 @@ import { formatCurrency } from "@/lib/utils";
 import BalanceCard from "@/components/BalanceCard";
 import PremiumCard from "@/components/PremiumCard";
 import ReferralCard from "@/components/ReferralCard";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useStations } from "@/hooks/useStations";
 import { useProfile } from "@/hooks/useProfile";
 import { useLocation } from "@/contexts/LocationContext";
@@ -59,14 +59,24 @@ const Index = () => {
     enabled: !!user?.id,
   });
 
-  // Mock notifications data - In a real app, this would come from an API
-  const notifications = [
-    { id: 1, title: "Nota fiscal aprovada", read: false },
-    { id: 2, title: "Cashback recebido", read: true },
-  ];
-  
-  const unreadCount = notifications.filter(n => !n.read).length;
-  
+  // Fetch unread notifications count
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['unread-notifications', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false)
+        .is('deleted_at', null);
+
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!user?.id,
+  });
+
   // Process and sort stations
   const processedStations = useMemo(() => {
     if (!stations) return [];
@@ -89,14 +99,14 @@ const Index = () => {
   }, [stations, selectedFuel]);
 
   return (
-    <div className="flex flex-col gap-6 pb-20 px-6 py-6" >
+    <div className="flex flex-col gap-6 pb-20 px-6 py-6">
       <section className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 pt-8 -mx-6 -mt-6 rounded-b-2xl">
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col">
-            <img src="/abasteci.svg"  alt="abasteci" className="h-8 mb-2" />
+            <img src="/abasteci.svg" alt="abasteci" className="h-8 mb-2" />
           </div>
           <Link to="/notifications" className="relative">
-            <Button variant="ghost" size="icon" className="text-green-800 ">
+            <Button variant="ghost" size="icon" className="text-green-800">
               <Bell className="h-6 w-6" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-green-700 text-white text-xs font-medium w-5 h-5 flex items-center justify-center rounded-full">
@@ -108,7 +118,8 @@ const Index = () => {
         </div>
         <BalanceCard 
           balance={wallet?.balance || 0} 
-          pendingBalance={pendingTotal || 0} 
+          pendingBalance={pendingTotal || 0}
+          isPremium={profile?.is_premium}
         />
       </section>
 
