@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
 
@@ -42,12 +43,16 @@ const Scanner = () => {
                 station_id: 1, // This should be determined by the QR code
                 status: 'processing'
               });
-            } catch (error) {
+            } catch (error: any) {
               console.error('Error submitting receipt:', error);
+              const errorMessage = error?.message?.includes('3 receipts per week')
+                ? "Você atingiu o limite de 3 notas por semana. Torne-se premium para enviar mais!"
+                : "Não foi possível registrar o cupom fiscal.";
+              
               toast({
                 variant: "destructive",
                 title: "Erro",
-                description: "Não foi possível registrar o cupom fiscal.",
+                description: errorMessage,
               });
             }
           },
@@ -92,12 +97,16 @@ const Scanner = () => {
         title: "Chave registrada com sucesso!",
         description: "O cupom fiscal foi registrado e está em análise.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting receipt:', error);
+      const errorMessage = error?.message?.includes('3 receipts per week')
+        ? "Você atingiu o limite de 3 notas por semana. Torne-se premium para enviar mais!"
+        : "Não foi possível registrar o cupom fiscal.";
+      
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Não foi possível registrar o cupom fiscal.",
+        description: errorMessage,
       });
     }
   };
@@ -127,6 +136,9 @@ const Scanner = () => {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Digite a chave do cupom fiscal</DialogTitle>
+                    <DialogDescription>
+                      Insira a chave do cupom fiscal para registrar
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 pt-4">
                     <Input
@@ -149,10 +161,10 @@ const Scanner = () => {
           <Card className="p-4 space-y-2">
             <h3 className="font-medium">Regras</h3>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li>• Limite de 3 cupons por semana</li>
+              <li>• Limite de 3 cupons por semana (usuários não premium)</li>
               <li>• R$ 0,10 de cashback por cupom</li>
               <li>• Processamento em até 15 dias</li>
-              <li>• Saque mínimo: R$ 20,00</li>
+              <li>• Saque mínimo: R$ 20,00 (usuários não premium)</li>
             </ul>
           </Card>
         </div>
