@@ -14,6 +14,7 @@ interface Profile {
   search_radius?: number;
   pix_key?: string;
   pix_key_type?: string;
+  is_premium?: boolean;
 }
 
 export const useProfile = () => {
