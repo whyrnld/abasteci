@@ -79,6 +79,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_premium: boolean | null
           phone: string
           pix_key: string | null
           pix_key_type: string | null
@@ -93,6 +94,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id: string
+          is_premium?: boolean | null
           phone: string
           pix_key?: string | null
           pix_key_type?: string | null
@@ -107,6 +109,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_premium?: boolean | null
           phone?: string
           pix_key?: string | null
           pix_key_type?: string | null
