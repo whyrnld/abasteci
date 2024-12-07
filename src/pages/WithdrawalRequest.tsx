@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { WithdrawalForm } from "@/components/withdrawals/WithdrawalForm";
 
 const WithdrawalRequest = () => {
@@ -15,6 +15,7 @@ const WithdrawalRequest = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const { data: wallet, refetch: refetchWallet } = useQuery({
     queryKey: ['wallet', user?.id],
@@ -63,18 +64,19 @@ const WithdrawalRequest = () => {
     }
 
     try {
-      // Update wallet balance
+      // Start a transaction by first updating the wallet balance
+      const newBalance = wallet.balance - withdrawalAmount;
       const { error: walletError } = await supabase
         .from('wallets')
         .update({ 
-          balance: wallet.balance - withdrawalAmount,
+          balance: newBalance,
           updated_at: new Date().toISOString()
         })
         .eq('profile_id', user?.id);
 
       if (walletError) throw walletError;
 
-      // Create withdrawal request
+      // Then create the withdrawal request
       const { error: withdrawalError } = await supabase
         .from('withdrawals')
         .insert({
@@ -84,9 +86,21 @@ const WithdrawalRequest = () => {
           pix_key_type: pixKeyType,
         });
 
-      if (withdrawalError) throw withdrawalError;
+      if (withdrawalError) {
+        // If withdrawal creation fails, revert the wallet balance
+        await supabase
+          .from('wallets')
+          .update({ 
+            balance: wallet.balance,
+            updated_at: new Date().toISOString()
+          })
+          .eq('profile_id', user?.id);
+        throw withdrawalError;
+      }
 
-      await refetchWallet();
+      // Invalidate queries to refresh data
+      await queryClient.invalidateQueries({ queryKey: ['wallet', user?.id] });
+      await queryClient.invalidateQueries({ queryKey: ['withdrawals', user?.id] });
 
       toast({
         title: "Solicitação enviada",
