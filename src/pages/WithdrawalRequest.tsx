@@ -20,13 +20,21 @@ const WithdrawalRequest = () => {
   const { data: wallet, refetch: refetchWallet } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
+      if (!user?.id) return null;
+      console.log('Fetching wallet for user:', user.id);
+      
       const { data, error } = await supabase
         .from('wallets')
         .select('*')
-        .eq('profile_id', user?.id)
+        .eq('profile_id', user.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching wallet:', error);
+        throw error;
+      }
+      
+      console.log('Fetched wallet:', data);
       return data;
     },
     enabled: !!user?.id
@@ -35,6 +43,11 @@ const WithdrawalRequest = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user?.id) {
+      console.error('No user found');
+      return;
+    }
+
     if (!pixKey) {
       toast({
         variant: "destructive",
@@ -64,6 +77,9 @@ const WithdrawalRequest = () => {
     }
 
     try {
+      console.log('Starting withdrawal process...');
+      console.log('Current wallet:', wallet);
+      
       // Start a transaction by first updating the wallet balance
       const newBalance = wallet.balance - withdrawalAmount;
       const { error: walletError } = await supabase
@@ -72,21 +88,27 @@ const WithdrawalRequest = () => {
           balance: newBalance,
           updated_at: new Date().toISOString()
         })
-        .eq('profile_id', user?.id);
+        .eq('profile_id', user.id);
 
-      if (walletError) throw walletError;
+      if (walletError) {
+        console.error('Error updating wallet:', walletError);
+        throw walletError;
+      }
+
+      console.log('Wallet updated successfully. Creating withdrawal request...');
 
       // Then create the withdrawal request
       const { error: withdrawalError } = await supabase
         .from('withdrawals')
         .insert({
-          user_id: user?.id,
+          user_id: user.id,
           amount: withdrawalAmount,
           pix_key: pixKey,
           pix_key_type: pixKeyType,
         });
 
       if (withdrawalError) {
+        console.error('Error creating withdrawal:', withdrawalError);
         // If withdrawal creation fails, revert the wallet balance
         await supabase
           .from('wallets')
@@ -94,13 +116,15 @@ const WithdrawalRequest = () => {
             balance: wallet.balance,
             updated_at: new Date().toISOString()
           })
-          .eq('profile_id', user?.id);
+          .eq('profile_id', user.id);
         throw withdrawalError;
       }
 
+      console.log('Withdrawal created successfully');
+
       // Invalidate queries to refresh data
-      await queryClient.invalidateQueries({ queryKey: ['wallet', user?.id] });
-      await queryClient.invalidateQueries({ queryKey: ['withdrawals', user?.id] });
+      await queryClient.invalidateQueries({ queryKey: ['wallet', user.id] });
+      await queryClient.invalidateQueries({ queryKey: ['withdrawals', user.id] });
 
       toast({
         title: "Solicitação enviada",
