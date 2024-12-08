@@ -21,10 +21,19 @@ interface StationDetailsProps {
     };
     calculatedDistance?: number | null;
   };
+  onBack?: () => void;
 }
 
-export const StationDetails = ({ station }: StationDetailsProps) => {
+export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
   const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -33,7 +42,7 @@ export const StationDetails = ({ station }: StationDetailsProps) => {
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="text-white hover:text-white/80"
           >
             <ArrowLeft className="h-6 w-6" />

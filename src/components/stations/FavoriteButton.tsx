@@ -10,7 +10,7 @@ interface FavoriteButtonProps {
   stationId: number;
 }
 
-const FavoriteButton = ({ stationId }: FavoriteButtonProps) => {
+export const FavoriteButton = ({ stationId }: FavoriteButtonProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -93,5 +93,3 @@ const FavoriteButton = ({ stationId }: FavoriteButtonProps) => {
     </Button>
   );
 };
-
-export default FavoriteButton;

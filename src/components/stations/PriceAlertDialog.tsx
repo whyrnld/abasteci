@@ -34,7 +34,7 @@ interface PriceAlertDialogProps {
   };
 }
 
-const PriceAlertDialog = ({ stationId, stationName, currentPrices }: PriceAlertDialogProps) => {
+export const PriceAlertDialog = ({ stationId, stationName, currentPrices }: PriceAlertDialogProps) => {
   const [open, setOpen] = useState(false);
   const [fuelType, setFuelType] = useState<string>("");
   const [targetPrice, setTargetPrice] = useState("");
@@ -136,5 +136,3 @@ const PriceAlertDialog = ({ stationId, stationName, currentPrices }: PriceAlertD
     </Dialog>
   );
 };
-
-export default PriceAlertDialog;
