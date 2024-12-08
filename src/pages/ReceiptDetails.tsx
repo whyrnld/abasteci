@@ -35,6 +35,17 @@ const ReceiptDetails = () => {
     return statusMap[status] || status;
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return 'bg-green-500';
+      case 'rejected':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
   if (isLoading) {
     return <div>Carregando...</div>;
   }
@@ -79,6 +90,34 @@ const ReceiptDetails = () => {
           <div>
             <p className="text-gray-500 text-sm mb-1">Chave da Nota</p>
             <p className="font-mono text-sm break-all">{receipt.invoice_key}</p>
+          </div>
+
+          <div className="relative pt-6">
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
+            
+            <div className="relative pl-8 pb-6">
+              <div className={`absolute left-2.5 w-3 h-3 rounded-full ${getStatusColor('processing')} -translate-x-1.5`} />
+              <div>
+                <p className="font-medium">Nota fiscal enviada</p>
+                <p className="text-sm text-gray-500">
+                  {format(new Date(receipt.created_at), 'dd/MM/yyyy HH:mm')}
+                </p>
+              </div>
+            </div>
+
+            {receipt.status !== 'processing' && (
+              <div className="relative pl-8">
+                <div className={`absolute left-2.5 w-3 h-3 rounded-full ${getStatusColor(receipt.status)} -translate-x-1.5`} />
+                <div>
+                  <p className="font-medium">
+                    {receipt.status === 'approved' ? 'Nota fiscal aprovada' : 'Nota fiscal rejeitada'}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {format(new Date(receipt.updated_at), 'dd/MM/yyyy HH:mm')}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Card>
