@@ -7,6 +7,14 @@ import { PriceAlertDialog } from "./PriceAlertDialog";
 import { FavoriteButton } from "./FavoriteButton";
 import { format } from "date-fns";
 import { PriceHistory } from "./PriceHistory";
+import { useState } from "react"; // Added missing useState import
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Added missing select components imports
 
 interface StationDetailsProps {
   station: {
