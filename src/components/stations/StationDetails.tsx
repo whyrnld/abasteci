@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import PriceHistory from "./PriceHistory";
-import PriceStats from "./PriceStats";
-import PriceAlertDialog from "./PriceAlertDialog";
-import FavoriteButton from "./FavoriteButton";
+import { PriceHistory } from "./PriceHistory";
+import { PriceStats } from "./PriceStats";
+import { PriceAlertDialog } from "./PriceAlertDialog";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface StationDetailsProps {
   station: {
@@ -23,7 +23,7 @@ interface StationDetailsProps {
   };
 }
 
-const StationDetails = ({ station }: StationDetailsProps) => {
+export const StationDetails = ({ station }: StationDetailsProps) => {
   const navigate = useNavigate();
 
   return (
@@ -82,10 +82,8 @@ const StationDetails = ({ station }: StationDetailsProps) => {
         </div>
       </Card>
 
-      <PriceHistory stationId={station.id} />
-      <PriceStats stationId={station.id} />
+      <PriceHistory stationId={station.id} selectedFuel="regular" />
+      <PriceStats stations={[station]} selectedFuel="regular" />
     </div>
   );
 };
-
-export default StationDetails;
