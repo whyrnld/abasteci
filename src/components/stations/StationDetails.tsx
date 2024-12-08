@@ -26,10 +26,10 @@ interface StationDetailsProps {
       premium: number;
       ethanol: number;
       diesel: number;
+      updated_at?: string;
     };
     calculatedDistance?: number | null;
     image_url?: string;
-    updated_at?: string;
   };
   onBack?: () => void;
 }
@@ -46,7 +46,7 @@ export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
     }
   };
 
-  const estimatedTime = station.calculatedDistance ? Math.round(station.calculatedDistance * 2) : null; // Rough estimate: 30km/h average speed
+  const estimatedTime = station.calculatedDistance ? Math.round(station.calculatedDistance * 2) : null;
 
   const openGoogleMaps = () => {
     if (station.calculatedDistance) {
@@ -94,10 +94,10 @@ export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
                 </p>
               </div>
             )}
-            {station.updated_at && (
+            {station.prices.updated_at && (
               <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
                 <Calendar className="w-4 h-4" />
-                <span>Atualizado em {format(new Date(station.updated_at), 'dd/MM/yyyy HH:mm')}</span>
+                <span>Atualizado em {format(new Date(station.prices.updated_at), 'dd/MM/yyyy HH:mm')}</span>
               </div>
             )}
           </div>
@@ -144,15 +144,10 @@ export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
         />
 
         <div className="mt-6">
-          <iframe
-            title="Station Map"
-            width="100%"
-            height="200"
-            frameBorder="0"
-            style={{ pointerEvents: "none" }}
-            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo&q=${encodeURIComponent(station.address)}&zoom=15&maptype=roadmap&disableDefaultUI=true`}
-            allowFullScreen
-            className="rounded-lg mb-4"
+          <img
+            src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(station.address)}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(station.address)}&key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo`}
+            alt="Station Location"
+            className="w-full h-[200px] object-cover rounded-lg mb-4"
           />
 
           <Button 
