@@ -137,7 +137,7 @@ export const PriceAlertDialog = ({ stationId, stationName, currentPrices }: Pric
     mutationFn: async (alertId: number) => {
       const { error } = await supabase
         .from('price_alerts')
-        .delete()
+        .update({ active: false })
         .eq('id', alertId);
 
       if (error) throw error;

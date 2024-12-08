@@ -6,6 +6,7 @@ import { formatCurrency } from "@/lib/utils";
 import { PriceAlertDialog } from "./PriceAlertDialog";
 import { FavoriteButton } from "./FavoriteButton";
 import { format } from "date-fns";
+import { PriceHistory } from "./PriceHistory";
 
 interface StationDetailsProps {
   station: {
@@ -27,6 +28,7 @@ interface StationDetailsProps {
 
 export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
   const navigate = useNavigate();
+  const [selectedFuel, setSelectedFuel] = useState("regular");
 
   const handleBack = () => {
     if (onBack) {
@@ -35,6 +37,8 @@ export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
       navigate(-1);
     }
   };
+
+  const estimatedTime = station.calculatedDistance ? Math.round(station.calculatedDistance * 2) : null; // Rough estimate: 30km/h average speed
 
   const openGoogleMaps = () => {
     if (station.calculatedDistance) {
@@ -78,7 +82,7 @@ export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
               <div className="flex items-center gap-2 mt-2">
                 <p className="text-sm text-gray-500">
                   {station.calculatedDistance.toFixed(1)}km de distância
-                  {/* Estimated time could be added here if available */}
+                  {estimatedTime && ` • ${estimatedTime} min`}
                 </p>
               </div>
             )}
@@ -137,14 +141,15 @@ export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
             width="100%"
             height="200"
             frameBorder="0"
-            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo&q=${encodeURIComponent(station.address)}`}
+            style={{ pointerEvents: "none" }}
+            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo&q=${encodeURIComponent(station.address)}&zoom=15&maptype=roadmap&disableDefaultUI=true`}
             allowFullScreen
             className="rounded-lg mb-4"
           />
 
           <Button 
             variant="outline" 
-            className="w-full" 
+            className="w-full mb-6" 
             onClick={openGoogleMaps}
             disabled={!station.calculatedDistance}
           >
@@ -152,6 +157,24 @@ export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
             <span>Traçar rota até o posto</span>
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
+
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Histórico de preços</h3>
+              <Select value={selectedFuel} onValueChange={setSelectedFuel}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Tipo de combustível" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="regular">Gasolina Comum</SelectItem>
+                  <SelectItem value="premium">Gasolina Aditivada</SelectItem>
+                  <SelectItem value="ethanol">Etanol</SelectItem>
+                  <SelectItem value="diesel">Diesel</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <PriceHistory stationId={station.id} selectedFuel={selectedFuel} />
+          </div>
         </div>
       </div>
     </div>

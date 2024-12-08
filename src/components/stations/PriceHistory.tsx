@@ -2,6 +2,7 @@ import { useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
 
 interface PriceHistoryProps {
   stationId: number;
@@ -16,6 +17,18 @@ export const PriceHistory = ({ stationId, selectedFuel }: PriceHistoryProps) => 
     date: new Date(Date.now() - (period - i) * 24 * 60 * 60 * 1000).toLocaleDateString(),
     price: 5 + Math.random() * 0.5,
   }));
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-2 border rounded shadow-sm">
+          <p className="text-sm">{label}</p>
+          <p className="text-sm font-semibold">{formatCurrency(payload[0].value)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <Card className="p-4">
@@ -37,8 +50,14 @@ export const PriceHistory = ({ stationId, selectedFuel }: PriceHistoryProps) => 
             <LineChart data={data}>
               <XAxis dataKey="date" />
               <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="price" stroke="#9b87f5" />
+              <Tooltip content={<CustomTooltip />} />
+              <Line 
+                type="monotone" 
+                dataKey="price" 
+                stroke="#9b87f5"
+                strokeWidth={2}
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
