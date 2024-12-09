@@ -19,7 +19,7 @@ const ReferralCard = () => {
     try {
       await navigator.share({
         title: "Ganhe R$ 5,00 no app",
-        text: `Use meu código ${referralCode} e ganhe R$ 5,00 de bônus!`,
+        text: `Use meu código ${referralCode} e ganhe R$ 5,00 de bônus após enviar 3 notas fiscais!`,
         url: shareUrl,
       });
     } catch (err) {
@@ -38,7 +38,7 @@ const ReferralCard = () => {
         <div>
           <h3 className="text-lg font-medium">Indique e Ganhe</h3>
           <p className="text-sm text-gray-500">
-            Ganhe R$ 5,00 para cada amigo que se cadastrar usando seu código
+            Ganhe R$ 5,00 para cada amigo que se cadastrar usando seu código e enviar 3 notas fiscais aprovadas
           </p>
         </div>
       </div>

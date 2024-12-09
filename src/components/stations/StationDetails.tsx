@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Heart, MapPin, Phone, ArrowLeft } from "lucide-react";
+import { Share2, Heart, MapPin, Phone, ArrowLeft, Clock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useFavoriteStations } from "@/hooks/useFavoriteStations";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import { formatCurrency, formatPhone } from "@/lib/utils";
 import { PriceAlertDialog } from "./PriceAlertDialog";
 import { Station } from "@/types";
 import { format } from "date-fns";
+import { PriceHistory } from "./PriceHistory";
 
 interface StationDetailsProps {
   station: Station;
@@ -60,42 +61,55 @@ const StationDetails = ({ station, onBack }: StationDetailsProps) => {
     );
   };
 
+  const estimatedTime = station.calculatedDistance 
+    ? Math.round(station.calculatedDistance * 2) // Rough estimate: 2 minutes per km
+    : null;
+
   return (
     <div className="flex-1 overflow-y-auto pb-20">
-      <div className="relative">
+      <div className="bg-gradient-to-r from-primary to-secondary p-4">
         <Button
           variant="ghost"
-          className="absolute left-2 top-2 z-10"
+          className="text-white mb-2"
           onClick={() => (onBack ? onBack() : navigate(-1))}
         >
-          <ArrowLeft className="h-6 w-6" />
+          <ArrowLeft className="h-6 w-6 mr-2" />
+          Voltar
         </Button>
-        <img
-          src={station.image_url || "/placeholder-station.jpg"}
-          alt={station.name}
-          className="w-full h-48 object-cover"
-        />
+        <h1 className="text-xl font-semibold text-white">{station.name}</h1>
       </div>
 
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-xl font-semibold mb-1">{station.name}</h1>
-            <p className="text-sm text-gray-500">{station.address}</p>
+          <div className="flex-1">
+            <p className="text-sm text-gray-500 mb-2">{station.address}</p>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Clock className="w-4 h-4" />
+              <span>Atualizado em {format(new Date(station.prices?.updated_at || new Date()), "dd/MM/yyyy HH:mm")}</span>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="icon" onClick={handleShare}>
-              <Share2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleFavorite}
-              className={isFavorite ? "text-red-500" : ""}
-            >
-              <Heart className="h-4 w-4" fill={isFavorite ? "currentColor" : "none"} />
-            </Button>
-          </div>
+          {station.calculatedDistance && (
+            <div className="text-right">
+              <p className="text-sm font-medium">{station.calculatedDistance.toFixed(1)} km</p>
+              {estimatedTime && (
+                <p className="text-xs text-gray-500">~{estimatedTime} min</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2 mb-6">
+          <Button variant="outline" size="icon" onClick={handleShare}>
+            <Share2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleFavorite}
+            className={isFavorite ? "text-red-500" : ""}
+          >
+            <Heart className="h-4 w-4" fill={isFavorite ? "currentColor" : "none"} />
+          </Button>
         </div>
 
         <Card className="p-4 mb-6">
@@ -139,9 +153,12 @@ const StationDetails = ({ station, onBack }: StationDetailsProps) => {
             className="w-full mt-4"
             onClick={() => setShowPriceAlert(true)}
           >
+            <Bell className="w-4 h-4 mr-2" />
             Criar alerta de preço
           </Button>
         </Card>
+
+        <PriceHistory stationId={station.id} selectedFuel="regular" />
 
         <div className="mt-6">
           <img
