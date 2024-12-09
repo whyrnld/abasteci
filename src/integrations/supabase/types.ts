@@ -209,6 +209,8 @@ export type Database = {
           pix_key: string | null
           pix_key_type: string | null
           preferred_fuel_type: string | null
+          referral_code: string | null
+          referred_by: string | null
           search_radius: number | null
           updated_at: string
         }
@@ -224,6 +226,8 @@ export type Database = {
           pix_key?: string | null
           pix_key_type?: string | null
           preferred_fuel_type?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           search_radius?: number | null
           updated_at?: string
         }
@@ -239,10 +243,20 @@ export type Database = {
           pix_key?: string | null
           pix_key_type?: string | null
           preferred_fuel_type?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           search_radius?: number | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       receipts: {
         Row: {
@@ -286,6 +300,48 @@ export type Database = {
           {
             foreignKeyName: "receipts_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          bonus_paid: boolean
+          created_at: string
+          id: number
+          referred_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          bonus_paid?: boolean
+          created_at?: string
+          id?: number
+          referred_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          bonus_paid?: boolean
+          created_at?: string
+          id?: number
+          referred_id?: string
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -414,7 +470,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_referral_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

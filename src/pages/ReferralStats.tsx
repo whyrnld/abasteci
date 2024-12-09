@@ -6,17 +6,7 @@ import { Users, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-
-interface Referral {
-  id: number;
-  referred: {
-    full_name: string;
-    created_at: string;
-  };
-  status: string;
-  bonus_paid: boolean;
-  created_at: string;
-}
+import { Referral } from "@/types";
 
 const ReferralStats = () => {
   const navigate = useNavigate();
@@ -42,10 +32,10 @@ const ReferralStats = () => {
       if (error) throw error;
 
       // Calculate total earned
-      const total = referralsData.filter(r => r.bonus_paid).length * 5;
+      const total = (referralsData?.filter(r => r.bonus_paid) || []).length * 5;
       setTotalEarned(total);
 
-      return referralsData as Referral[];
+      return referralsData as unknown as Referral[];
     },
   });
 

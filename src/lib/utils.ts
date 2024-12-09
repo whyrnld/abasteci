@@ -22,6 +22,11 @@ export function maskPhone(phone: string): string {
   return phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
 }
 
+export function formatPhone(phone: string): string {
+  if (!phone) return "";
+  return maskPhone(phone);
+}
+
 export function getFirstName(fullName: string): string {
   return fullName.split(" ")[0];
 }

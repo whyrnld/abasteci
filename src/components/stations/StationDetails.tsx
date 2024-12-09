@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { formatCurrency, formatPhone } from "@/lib/utils";
 import { PriceAlertDialog } from "./PriceAlertDialog";
 import { Station } from "@/types";
+import { format } from "date-fns";
 
 interface StationDetailsProps {
   station: Station;
