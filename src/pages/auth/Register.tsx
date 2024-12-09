@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,10 @@ import { supabase } from "@/lib/supabase";
 import { maskCPF, maskPhone } from "@/lib/utils";
 
 const Register = () => {
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get("ref");
+  const [referrerId, setReferrerId] = useState<string | null>(null);
+  
   const [formData, setFormData] = useState({
     fullName: "",
     cpf: "",
@@ -21,6 +25,35 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const validateReferralCode = async () => {
+      if (!referralCode) return;
+      
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("referral_code", referralCode)
+        .single();
+      
+      if (error || !data) {
+        toast({
+          variant: "destructive",
+          title: "Código de indicação inválido",
+          description: "O código informado não existe.",
+        });
+        return;
+      }
+      
+      setReferrerId(data.id);
+      toast({
+        title: "Código de indicação válido!",
+        description: "Você receberá R$ 5,00 ao se cadastrar.",
+      });
+    };
+    
+    validateReferralCode();
+  }, [referralCode, toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,6 +86,7 @@ const Register = () => {
             phone: formData.phone,
             birth_date: formData.birthDate,
             email: formData.email,
+            referred_by: referrerId,
           },
         },
       });
@@ -84,6 +118,12 @@ const Register = () => {
           <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Criar nova conta
           </h2>
+          
+          {referralCode && referrerId && (
+            <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm text-center">
+              Você foi indicado e receberá R$ 5,00 ao se cadastrar!
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>

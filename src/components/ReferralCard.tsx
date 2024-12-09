@@ -2,22 +2,30 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useProfile } from "@/hooks/useProfile";
+import { useNavigate } from "react-router-dom";
 
 const ReferralCard = () => {
   const { toast } = useToast();
-  const referralCode = "ABC123";
+  const { profile } = useProfile();
+  const navigate = useNavigate();
+  const referralCode = profile?.referral_code;
 
   const handleShare = async () => {
+    if (!referralCode) return;
+    
+    const shareUrl = `${window.location.origin}/auth/register?ref=${referralCode}`;
+    
     try {
       await navigator.share({
         title: "Ganhe R$ 5,00 no app",
         text: `Use meu código ${referralCode} e ganhe R$ 5,00 de bônus!`,
-        url: window.location.origin,
+        url: shareUrl,
       });
     } catch (err) {
-      navigator.clipboard.writeText(referralCode);
+      navigator.clipboard.writeText(shareUrl);
       toast({
-        title: "Código copiado!",
+        title: "Link copiado!",
         description: "Compartilhe com seus amigos.",
       });
     }
@@ -34,9 +42,25 @@ const ReferralCard = () => {
           </p>
         </div>
       </div>
-      <Button variant="outline" className="w-full" onClick={handleShare}>
-        Compartilhar código
-      </Button>
+      
+      <div className="space-y-4">
+        <div className="bg-gray-100 p-3 rounded-lg text-center">
+          <p className="text-sm text-gray-500 mb-1">Seu código</p>
+          <p className="text-xl font-medium">{referralCode || "..."}</p>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="outline" className="w-full" onClick={handleShare}>
+            Compartilhar
+          </Button>
+          <Button 
+            className="w-full"
+            onClick={() => navigate("/referral-stats")}
+          >
+            Ver Indicações
+          </Button>
+        </div>
+      </div>
     </Card>
   );
 };

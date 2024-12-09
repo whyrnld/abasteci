@@ -1,185 +1,184 @@
-import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Share2, Heart, MapPin, Phone, ArrowLeft } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useFavoriteStations } from "@/hooks/useFavoriteStations";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Calendar, Map, ArrowRight, Droplet, Fuel, Zap, Truck } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatPhone } from "@/lib/utils";
 import { PriceAlertDialog } from "./PriceAlertDialog";
-import { FavoriteButton } from "./FavoriteButton";
-import { format } from "date-fns";
-import { PriceHistory } from "./PriceHistory";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Station } from "@/types";
 
 interface StationDetailsProps {
-  station: {
-    id: number;
-    name: string;
-    address: string;
-    prices: {
-      regular: number;
-      premium: number;
-      ethanol: number;
-      diesel: number;
-      updated_at?: string;
-    };
-    calculatedDistance?: number | null;
-    image_url?: string;
-  };
+  station: Station;
   onBack?: () => void;
 }
 
-export const StationDetails = ({ station, onBack }: StationDetailsProps) => {
+const StationDetails = ({ station, onBack }: StationDetailsProps) => {
+  const [showPriceAlert, setShowPriceAlert] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const [selectedFuel, setSelectedFuel] = useState("regular");
+  const { favorites, toggleFavorite } = useFavoriteStations();
+  const isFavorite = favorites?.some((f) => f.station_id === station.id);
 
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      navigate(-1);
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: station.name,
+        text: `Confira os preços em ${station.name}`,
+        url: window.location.href,
+      });
+    } catch (err) {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copiado!",
+        description: "Compartilhe com seus amigos.",
+      });
     }
   };
 
-  const estimatedTime = station.calculatedDistance ? Math.round(station.calculatedDistance * 2) : null;
+  const handleFavorite = async () => {
+    await toggleFavorite(station.id);
+    toast({
+      title: isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos",
+      description: isFavorite
+        ? "O posto foi removido dos seus favoritos"
+        : "O posto foi adicionado aos seus favoritos",
+    });
+  };
 
-  const openGoogleMaps = () => {
-    if (station.calculatedDistance) {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${station.address}`, '_blank');
-    }
+  const handleCall = () => {
+    window.location.href = `tel:${station.phone}`;
+  };
+
+  const handleOpenMaps = () => {
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${station.latitude},${station.longitude}`,
+      "_blank"
+    );
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <section className="bg-gradient-to-r from-primary to-secondary p-6 -mx-6 -mt-6">
-        <div className="flex items-center justify-between mb-4">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleBack}
-            className="text-white hover:text-white/80"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-          <FavoriteButton stationId={station.id} />
-        </div>
-        
-        <h1 className="text-xl font-semibold text-white mb-2">{station.name}</h1>
-      </section>
+    <div className="flex-1 overflow-y-auto pb-20">
+      <div className="relative">
+        <Button
+          variant="ghost"
+          className="absolute left-2 top-2 z-10"
+          onClick={() => (onBack ? onBack() : navigate(-1))}
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </Button>
+        <img
+          src={station.image_url || "/placeholder-station.jpg"}
+          alt={station.name}
+          className="w-full h-48 object-cover"
+        />
+      </div>
 
-      <div className="px-6">
-        <div className="flex items-start gap-4 mb-6">
-          {station.image_url && (
-            <img 
-              src={station.image_url} 
-              alt={station.name} 
-              className="w-16 h-16 rounded-lg object-cover"
-            />
-          )}
-          <div className="flex-1">
-            <div className="flex items-start gap-2">
-              <MapPin className="w-4 h-4 mt-1 text-gray-500 shrink-0" />
-              <p className="text-sm text-gray-700">{station.address}</p>
-            </div>
-            {station.calculatedDistance && (
-              <div className="flex items-center gap-2 mt-2">
-                <p className="text-sm text-gray-500">
-                  {station.calculatedDistance.toFixed(1)}km de distância
-                  {estimatedTime && ` • ${estimatedTime} min`}
-                </p>
-              </div>
-            )}
-            {station.prices.updated_at && (
-              <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                <Calendar className="w-4 h-4" />
-                <span>Atualizado em {format(new Date(station.prices.updated_at), 'dd/MM/yyyy HH:mm')}</span>
-              </div>
-            )}
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h1 className="text-xl font-semibold mb-1">{station.name}</h1>
+            <p className="text-sm text-gray-500">{station.address}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={handleShare}>
+              <Share2 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleFavorite}
+              className={isFavorite ? "text-red-500" : ""}
+            >
+              <Heart className="h-4 w-4" fill={isFavorite ? "currentColor" : "none"} />
+            </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <Card className="p-4 bg-blue-50">
-            <div className="flex items-center gap-2 mb-2">
-              <Droplet className="w-5 h-5 text-blue-600" />
-              <span className="text-sm text-gray-600">Gasolina Comum</span>
-            </div>
-            <p className="text-xl font-semibold">{formatCurrency(station.prices.regular)}</p>
-          </Card>
-
-          <Card className="p-4 bg-purple-50">
-            <div className="flex items-center gap-2 mb-2">
-              <Fuel className="w-5 h-5 text-purple-600" />
-              <span className="text-sm text-gray-600">Gasolina Aditivada</span>
-            </div>
-            <p className="text-xl font-semibold">{formatCurrency(station.prices.premium)}</p>
-          </Card>
-
-          <Card className="p-4 bg-green-50">
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-5 h-5 text-green-600" />
-              <span className="text-sm text-gray-600">Etanol</span>
-            </div>
-            <p className="text-xl font-semibold">{formatCurrency(station.prices.ethanol)}</p>
-          </Card>
-
-          <Card className="p-4 bg-orange-50">
-            <div className="flex items-center gap-2 mb-2">
-              <Truck className="w-5 h-5 text-orange-600" />
-              <span className="text-sm text-gray-600">Diesel</span>
-            </div>
-            <p className="text-xl font-semibold">{formatCurrency(station.prices.diesel)}</p>
-          </Card>
-        </div>
-
-        <PriceAlertDialog
-          stationId={station.id}
-          stationName={station.name}
-          currentPrices={station.prices}
-        />
+        <Card className="p-4 mb-6">
+          <h2 className="font-medium mb-3">Preços</h2>
+          <div className="space-y-2">
+            {station.prices?.regular > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Gasolina Comum</span>
+                <Badge variant="outline">
+                  {formatCurrency(station.prices.regular)}
+                </Badge>
+              </div>
+            )}
+            {station.prices?.premium > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Gasolina Aditivada</span>
+                <Badge variant="outline">
+                  {formatCurrency(station.prices.premium)}
+                </Badge>
+              </div>
+            )}
+            {station.prices?.ethanol > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Etanol</span>
+                <Badge variant="outline">
+                  {formatCurrency(station.prices.ethanol)}
+                </Badge>
+              </div>
+            )}
+            {station.prices?.diesel > 0 && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Diesel</span>
+                <Badge variant="outline">
+                  {formatCurrency(station.prices.diesel)}
+                </Badge>
+              </div>
+            )}
+          </div>
+          <Button
+            variant="outline"
+            className="w-full mt-4"
+            onClick={() => setShowPriceAlert(true)}
+          >
+            Criar alerta de preço
+          </Button>
+        </Card>
 
         <div className="mt-6">
           <img
-            src={`https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(station.address)}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${encodeURIComponent(station.address)}&key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo`}
+            src={`https://maps.googleapis.com/maps/api/staticmap?center=${station.latitude},${station.longitude}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${station.latitude},${station.longitude}&key=AIzaSyD-nDc6tXCTKcFJvWQmWEFuKVKT7w7B9Wo`}
             alt="Station Location"
             className="w-full h-[200px] object-cover rounded-lg mb-4"
           />
-
-          <Button 
-            variant="outline" 
-            className="w-full mb-6" 
-            onClick={openGoogleMaps}
-            disabled={!station.calculatedDistance}
-          >
-            <Map className="w-4 h-4 mr-2" />
-            <span>Traçar rota até o posto</span>
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Histórico de preços</h3>
-              <Select value={selectedFuel} onValueChange={setSelectedFuel}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Tipo de combustível" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="regular">Gasolina Comum</SelectItem>
-                  <SelectItem value="premium">Gasolina Aditivada</SelectItem>
-                  <SelectItem value="ethanol">Etanol</SelectItem>
-                  <SelectItem value="diesel">Diesel</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <PriceHistory stationId={station.id} selectedFuel={selectedFuel} />
+          
+          <div className="grid grid-cols-2 gap-4">
+            {station.phone && (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleCall}
+              >
+                <Phone className="h-4 w-4 mr-2" />
+                {formatPhone(station.phone)}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleOpenMaps}
+            >
+              <MapPin className="h-4 w-4 mr-2" />
+              Ver no mapa
+            </Button>
           </div>
         </div>
       </div>
+
+      <PriceAlertDialog
+        open={showPriceAlert}
+        onOpenChange={setShowPriceAlert}
+        station={station}
+      />
     </div>
   );
 };
+
+export default StationDetails;
