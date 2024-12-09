@@ -124,7 +124,8 @@ const StationDetails = ({ station, onBack }: StationDetailsProps) => {
       <PriceAlertDialog
         open={showPriceAlert}
         onOpenChange={setShowPriceAlert}
-        station={station}
+        stationId={station.id}
+        prices={station.prices || { regular: 0, premium: 0, ethanol: 0, diesel: 0 }}
       />
     </div>
   );
