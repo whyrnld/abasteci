@@ -17,9 +17,25 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
 
       if (error) throw error;
+
+      // Send custom email using our edge function
+      await supabase.functions.invoke('send-email', {
+        body: {
+          to: [email],
+          subject: "Redefinição de senha - Abasteci",
+          html: `
+            <h2>Redefinição de senha</h2>
+            <p>Você solicitou a redefinição de sua senha no aplicativo Abasteci.</p>
+            <p>Clique no link que enviamos para seu email para definir uma nova senha.</p>
+            <p>Se você não solicitou esta alteração, ignore este email.</p>
+          `,
+        },
+      });
 
       toast({
         title: "Email enviado!",
@@ -27,6 +43,7 @@ const ForgotPassword = () => {
       });
       navigate("/auth/login");
     } catch (error: any) {
+      console.error("Error in password reset:", error);
       toast({
         variant: "destructive",
         title: "Erro",
@@ -38,7 +55,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 px-6 py-6" >
+    <div className="min-h-screen flex flex-col bg-gray-50 px-6 py-6">
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
         <div className="mx-auto w-full max-w-sm">
           <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
