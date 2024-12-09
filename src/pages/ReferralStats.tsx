@@ -2,11 +2,17 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Card } from "@/components/ui/card";
-import { Users, ArrowLeft } from "lucide-react";
+import { Users, ArrowLeft, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Referral } from "@/types";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const ReferralStats = () => {
   const navigate = useNavigate();
@@ -63,6 +69,21 @@ const ReferralStats = () => {
           </div>
         </div>
 
+        <div className="bg-blue-50 p-4 rounded-lg mb-6">
+          <div className="flex items-start gap-2">
+            <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-700">
+              <p className="font-medium mb-1">Como funciona?</p>
+              <ul className="space-y-1">
+                <li>1. Compartilhe seu código de indicação</li>
+                <li>2. Seu amigo se cadastra usando seu código</li>
+                <li>3. Seu amigo precisa enviar 3 notas fiscais que sejam aprovadas</li>
+                <li>4. Vocês dois ganham R$ 5,00 cada!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-sm text-gray-500">Total de Indicações</p>
@@ -99,17 +120,38 @@ const ReferralStats = () => {
                         )}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <span
-                        className={`text-sm px-2 py-1 rounded-full ${
-                          referral.bonus_paid
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {referral.bonus_paid ? "Bônus Pago" : "Pendente"}
-                      </span>
-                    </div>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="text-right">
+                            <span
+                              className={`text-sm px-2 py-1 rounded-full ${
+                                referral.bonus_paid
+                                  ? "bg-green-100 text-green-800"
+                                  : referral.status === "completed"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {referral.bonus_paid 
+                                ? "Bônus Pago" 
+                                : referral.status === "completed"
+                                ? "Aguardando Pagamento"
+                                : "Pendente"}
+                            </span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>
+                            {referral.bonus_paid 
+                              ? "Bônus de R$ 5,00 já foi pago"
+                              : referral.status === "completed"
+                              ? "Indicado já enviou 3 notas aprovadas"
+                              : "Aguardando 3 notas fiscais aprovadas"}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </Card>
               ))}
