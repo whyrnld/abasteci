@@ -8,7 +8,7 @@ import { useStations } from "@/hooks/useStations";
 import { useLocation } from "@/contexts/LocationContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { Slider } from "@/components/ui/slider";
-import { StationDetails } from "@/components/stations/StationDetails";
+import StationDetails from "@/components/stations/StationDetails";
 
 const Stations = () => {
   const [selectedFuel, setSelectedFuel] = useState("regular");

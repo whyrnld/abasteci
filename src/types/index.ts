@@ -13,6 +13,7 @@ export interface Station {
     diesel: number;
     updated_at: string;
   };
+  calculatedDistance?: number;
 }
 
 export interface Profile {
