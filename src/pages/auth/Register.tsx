@@ -70,9 +70,9 @@ const Register = () => {
         processedValue = processedValue.slice(0, 8);
       }
       if (processedValue.length >= 8) {
-        const year = processedValue.slice(4, 8);
-        const month = processedValue.slice(2, 4);
         const day = processedValue.slice(0, 2);
+        const month = processedValue.slice(2, 4);
+        const year = processedValue.slice(4, 8);
         processedValue = `${year}-${month}-${day}`;
       }
     }
@@ -81,6 +81,13 @@ const Register = () => {
       ...prev,
       [name]: processedValue,
     }));
+  };
+
+  const formatBirthDate = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -173,7 +180,7 @@ const Register = () => {
                 name="cpf"
                 type="text"
                 required
-                maxLength={11}
+                maxLength={14}
                 value={maskCPF(formData.cpf)}
                 onChange={handleChange}
                 className="mt-2"
@@ -188,7 +195,7 @@ const Register = () => {
                 name="phone"
                 type="text"
                 required
-                maxLength={11}
+                maxLength={15}
                 value={maskPhone(formData.phone)}
                 onChange={handleChange}
                 className="mt-2"
@@ -203,10 +210,11 @@ const Register = () => {
                 name="birthDate"
                 type="text"
                 required
-                value={formData.birthDate}
+                value={formatBirthDate(formData.birthDate)}
                 onChange={handleChange}
                 className="mt-2"
                 placeholder="DD/MM/AAAA"
+                maxLength={10}
               />
             </div>
 
