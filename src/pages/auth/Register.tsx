@@ -69,10 +69,11 @@ const Register = () => {
       if (processedValue.length > 8) {
         processedValue = processedValue.slice(0, 8);
       }
+      // Convert from DD/MM/YYYY to YYYY-MM-DD for storage
       if (processedValue.length >= 8) {
-        const year = processedValue.slice(4, 8);
-        const month = processedValue.slice(2, 4);
         const day = processedValue.slice(0, 2);
+        const month = processedValue.slice(2, 4);
+        const year = processedValue.slice(4, 8);
         processedValue = `${year}-${month}-${day}`;
       }
     }
@@ -81,6 +82,21 @@ const Register = () => {
       ...prev,
       [name]: processedValue,
     }));
+  };
+
+  // Format the birth date for display (YYYY-MM-DD to DD/MM/YYYY)
+  const formatBirthDateForDisplay = (value: string) => {
+    if (!value) return "";
+    if (value.includes("-")) {
+      // If it's in YYYY-MM-DD format, convert to DD/MM/YYYY
+      const [year, month, day] = value.split("-");
+      return `${day}/${month}/${year}`;
+    }
+    // If it's just numbers, format as user types
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
+    return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,7 +219,7 @@ const Register = () => {
                 name="birthDate"
                 type="text"
                 required
-                value={formData.birthDate}
+                value={formatBirthDateForDisplay(formData.birthDate)}
                 onChange={handleChange}
                 className="mt-2"
                 placeholder="DD/MM/AAAA"

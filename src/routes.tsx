@@ -18,6 +18,7 @@ import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ReferralStats from "./pages/ReferralStats";
+import PriceAlerts from "./pages/PriceAlerts";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -201,6 +202,14 @@ export const AppRoutes = () => (
       element={
         <PrivateRoute>
           <ReferralStats />
+        </PrivateRoute>
+      }
+    />
+    <Route
+      path="/price-alerts"
+      element={
+        <PrivateRoute>
+          <PriceAlerts />
         </PrivateRoute>
       }
     />
