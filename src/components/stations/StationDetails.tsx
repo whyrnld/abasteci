@@ -98,7 +98,7 @@ const StationDetails = ({ station, onBack }: StationDetailsProps) => {
             className="w-full h-[200px] object-cover rounded-lg mb-4"
           />
           
-          <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             {station.phone && (
               <Button
                 variant="outline"
