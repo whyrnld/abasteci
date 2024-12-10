@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface PriceAlertDialogProps {
   open: boolean;
@@ -113,7 +114,12 @@ export function PriceAlertDialog({ open, onOpenChange, stationId, prices }: Pric
               onValueChange={setSelectedFuel}
               className="grid grid-cols-2 gap-4"
             >
-              <Label className="flex items-center gap-2 p-4 border rounded-lg cursor-pointer">
+              <Label 
+                className={cn(
+                  "flex items-center gap-2 p-4 border rounded-lg cursor-pointer transition-colors",
+                  selectedFuel === "regular" && "border-green-500 bg-green-50"
+                )}
+              >
                 <RadioGroupItem value="regular" className="sr-only" />
                 <div>
                   <p>Comum</p>
@@ -122,7 +128,12 @@ export function PriceAlertDialog({ open, onOpenChange, stationId, prices }: Pric
                   </p>
                 </div>
               </Label>
-              <Label className="flex items-center gap-2 p-4 border rounded-lg cursor-pointer">
+              <Label 
+                className={cn(
+                  "flex items-center gap-2 p-4 border rounded-lg cursor-pointer transition-colors",
+                  selectedFuel === "premium" && "border-green-500 bg-green-50"
+                )}
+              >
                 <RadioGroupItem value="premium" className="sr-only" />
                 <div>
                   <p>Aditivada</p>
@@ -131,7 +142,12 @@ export function PriceAlertDialog({ open, onOpenChange, stationId, prices }: Pric
                   </p>
                 </div>
               </Label>
-              <Label className="flex items-center gap-2 p-4 border rounded-lg cursor-pointer">
+              <Label 
+                className={cn(
+                  "flex items-center gap-2 p-4 border rounded-lg cursor-pointer transition-colors",
+                  selectedFuel === "ethanol" && "border-green-500 bg-green-50"
+                )}
+              >
                 <RadioGroupItem value="ethanol" className="sr-only" />
                 <div>
                   <p>Etanol</p>
@@ -140,7 +156,12 @@ export function PriceAlertDialog({ open, onOpenChange, stationId, prices }: Pric
                   </p>
                 </div>
               </Label>
-              <Label className="flex items-center gap-2 p-4 border rounded-lg cursor-pointer">
+              <Label 
+                className={cn(
+                  "flex items-center gap-2 p-4 border rounded-lg cursor-pointer transition-colors",
+                  selectedFuel === "diesel" && "border-green-500 bg-green-50"
+                )}
+              >
                 <RadioGroupItem value="diesel" className="sr-only" />
                 <div>
                   <p>Diesel</p>

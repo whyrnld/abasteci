@@ -12,15 +12,17 @@ export const StationHeader = ({ name, onBack }: StationHeaderProps) => {
 
   return (
     <div className="bg-gradient-to-r from-primary to-secondary p-4">
-      <Button
-        variant="ghost"
-        className="text-white mb-2"
-        onClick={() => (onBack ? onBack() : navigate(-1))}
-      >
-        <ArrowLeft className="h-6 w-6 mr-2" />
-        Voltar
-      </Button>
-      <h1 className="text-xl font-semibold text-white">{name}</h1>
+      <div className="flex items-center gap-3">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-white"
+          onClick={() => (onBack ? onBack() : navigate(-1))}
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </Button>
+        <h1 className="text-xl font-semibold text-white">{name}</h1>
+      </div>
     </div>
   );
 };

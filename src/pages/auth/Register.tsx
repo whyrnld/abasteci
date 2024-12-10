@@ -20,6 +20,7 @@ const Register = () => {
     phone: "",
     birthDate: "",
     password: "",
+    referralCode: referralCode || "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,12 +29,12 @@ const Register = () => {
 
   useEffect(() => {
     const validateReferralCode = async () => {
-      if (!referralCode) return;
+      if (!formData.referralCode) return;
       
       const { data, error } = await supabase
         .from("profiles")
         .select("id")
-        .eq("referral_code", referralCode)
+        .eq("referral_code", formData.referralCode)
         .single();
       
       if (error || !data) {
@@ -53,16 +54,27 @@ const Register = () => {
     };
     
     validateReferralCode();
-  }, [referralCode, toast]);
+  }, [formData.referralCode, toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     let processedValue = value;
 
     if (name === "cpf") {
-      processedValue = value.replace(/\D/g, "");
+      processedValue = value.replace(/\D/g, "").slice(0, 11);
     } else if (name === "phone") {
+      processedValue = value.replace(/\D/g, "").slice(0, 11);
+    } else if (name === "birthDate") {
       processedValue = value.replace(/\D/g, "");
+      if (processedValue.length > 8) {
+        processedValue = processedValue.slice(0, 8);
+      }
+      if (processedValue.length >= 8) {
+        const year = processedValue.slice(4, 8);
+        const month = processedValue.slice(2, 4);
+        const day = processedValue.slice(0, 2);
+        processedValue = `${year}-${month}-${day}`;
+      }
     }
 
     setFormData((prev) => ({
@@ -161,6 +173,7 @@ const Register = () => {
                 name="cpf"
                 type="text"
                 required
+                maxLength={11}
                 value={maskCPF(formData.cpf)}
                 onChange={handleChange}
                 className="mt-2"
@@ -175,6 +188,7 @@ const Register = () => {
                 name="phone"
                 type="text"
                 required
+                maxLength={11}
                 value={maskPhone(formData.phone)}
                 onChange={handleChange}
                 className="mt-2"
@@ -187,11 +201,25 @@ const Register = () => {
               <Input
                 id="birthDate"
                 name="birthDate"
-                type="date"
+                type="text"
                 required
                 value={formData.birthDate}
                 onChange={handleChange}
                 className="mt-2"
+                placeholder="DD/MM/AAAA"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="referralCode">Código de indicação (opcional)</Label>
+              <Input
+                id="referralCode"
+                name="referralCode"
+                type="text"
+                value={formData.referralCode}
+                onChange={handleChange}
+                className="mt-2"
+                placeholder="Digite o código de indicação"
               />
             </div>
 

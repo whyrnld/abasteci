@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Filter, ArrowLeft, Navigation, MapPin } from "lucide-react";
+import { Filter, ArrowLeft, Navigation, MapPin, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StationsList } from "@/components/stations/StationsList";
@@ -9,18 +9,19 @@ import { useLocation } from "@/contexts/LocationContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { Slider } from "@/components/ui/slider";
 import StationDetails from "@/components/stations/StationDetails";
+import { MyAlertsDialog } from "@/components/stations/MyAlertsDialog";
 
 const Stations = () => {
   const [selectedFuel, setSelectedFuel] = useState("regular");
   const [sortBy, setSortBy] = useState("distance");
   const [maxDistance, setMaxDistance] = useState(10);
+  const [showMyAlerts, setShowMyAlerts] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
   const { location, isLoading: locationLoading, getCurrentLocation } = useLocation();
   
   const { data: stations, isLoading: stationsLoading } = useStations();
 
-  // Filter and sort stations
   const processedStations = stations?.filter(station => {
     if (!location) return true;
     const distance = station.calculatedDistance;
@@ -70,6 +71,15 @@ const Stations = () => {
       </section>
 
       <div className="flex flex-col gap-4 p-4 pb-20 w-full">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => setShowMyAlerts(true)}
+        >
+          <Bell className="w-4 h-4 mr-2" />
+          Ver Meus Alertas
+        </Button>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <span className="text-sm font-medium text-gray-700">Combustível</span>
@@ -136,6 +146,11 @@ const Stations = () => {
           <div className="text-center py-4">Nenhum posto encontrado</div>
         )}
       </div>
+
+      <MyAlertsDialog
+        open={showMyAlerts}
+        onOpenChange={setShowMyAlerts}
+      />
     </div>
   );
 };
