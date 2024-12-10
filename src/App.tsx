@@ -6,9 +6,8 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LocationProvider } from "./contexts/LocationContext";
 import BottomNav from "./components/BottomNav";
-import routes from "./routes";
+import { AppRoutes } from "./routes";
 import { useAuth } from "./contexts/AuthContext";
-import { Routes, Route } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -20,11 +19,7 @@ const AppContent = () => {
       <div className="max-w-md mx-auto bg-white min-h-screen relative">
         <Toaster />
         <Sonner />
-        <Routes>
-          {routes.map((route) => (
-            <Route key={route.path} {...route} />
-          ))}
-        </Routes>
+        <AppRoutes />
         {user && <BottomNav />}
       </div>
     </div>
