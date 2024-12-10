@@ -74,7 +74,7 @@ const Stations = () => {
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => setShowMyAlerts(true)}
+          onClick={() => navigate("/price-alerts")}
         >
           <Bell className="w-4 h-4 mr-2" />
           Ver Meus Alertas

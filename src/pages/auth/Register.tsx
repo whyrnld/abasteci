@@ -69,11 +69,11 @@ const Register = () => {
       if (processedValue.length > 8) {
         processedValue = processedValue.slice(0, 8);
       }
-      if (processedValue.length >= 8) {
-        const year = processedValue.slice(4, 8);
-        const month = processedValue.slice(2, 4);
-        const day = processedValue.slice(0, 2);
-        processedValue = `${year}-${month}-${day}`;
+      if (processedValue.length >= 2) {
+        processedValue = processedValue.slice(0, 2) + (processedValue.length > 2 ? "/" + processedValue.slice(2) : "");
+      }
+      if (processedValue.length >= 5) {
+        processedValue = processedValue.slice(0, 5) + (processedValue.length > 5 ? "/" + processedValue.slice(5) : "");
       }
     }
 
@@ -88,6 +88,10 @@ const Register = () => {
     setLoading(true);
 
     try {
+      // Convert DD/MM/YYYY to YYYY-MM-DD
+      const [day, month, year] = formData.birthDate.split("/");
+      const formattedDate = `${year}-${month}-${day}`;
+
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -96,7 +100,7 @@ const Register = () => {
             full_name: formData.fullName,
             cpf: formData.cpf,
             phone: formData.phone,
-            birth_date: formData.birthDate,
+            birth_date: formattedDate,
             email: formData.email,
             referred_by: referrerId,
           },
