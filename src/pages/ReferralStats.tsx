@@ -13,14 +13,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ReferralStats = () => {
   const navigate = useNavigate();
   const [totalEarned, setTotalEarned] = useState(0);
+  const { user } = useAuth();
 
   const { data: referrals, isLoading } = useQuery({
     queryKey: ["referrals"],
     queryFn: async () => {
+      if (!user?.id) throw new Error("User not authenticated");
+
       const { data: referralsData, error } = await supabase
         .from("referrals")
         .select(`
@@ -33,7 +37,7 @@ const ReferralStats = () => {
             created_at
           )
         `)
-        .eq("referrer_id", (await supabase.auth.getUser()).data.user?.id);
+        .eq("referrer_id", user.id);
 
       if (error) throw error;
 
@@ -43,6 +47,7 @@ const ReferralStats = () => {
 
       return referralsData as unknown as Referral[];
     },
+    enabled: !!user?.id,
   });
 
   return (

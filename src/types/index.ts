@@ -29,7 +29,7 @@ export interface Profile {
   pix_key_type?: string;
   is_premium?: boolean;
   referral_code?: string;
-  referred_by?: string;
+  referred_by?: string | null;
 }
 
 export interface Referral {
