@@ -4,7 +4,6 @@ import { Users } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
-import { Profile } from "@/types";
 
 const ReferralCard = () => {
   const { toast } = useToast();
