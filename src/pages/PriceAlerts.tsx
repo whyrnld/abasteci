@@ -1,12 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatCurrency } from "@/lib/utils";
-import { Bell } from "lucide-react";
+import { Bell, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function PriceAlerts() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: alerts } = useQuery({
     queryKey: ["all-price-alerts"],
@@ -30,9 +35,37 @@ export default function PriceAlerts() {
     enabled: !!user?.id,
   });
 
+  const deleteAlert = useMutation({
+    mutationFn: async (alertId: number) => {
+      const { error } = await supabase
+        .from("price_alerts")
+        .update({ active: false })
+        .eq("id", alertId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-price-alerts"] });
+      toast({
+        title: "Alerta excluído",
+        description: "O alerta de preço foi excluído com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível excluir o alerta.",
+      });
+    },
+  });
+
   return (
     <div className="container py-6 space-y-6">
       <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         <Bell className="w-5 h-5" />
         <h1 className="text-xl font-medium">Meus Alertas de Preço</h1>
       </div>
@@ -60,18 +93,22 @@ export default function PriceAlerts() {
                   Meta: {formatCurrency(alert.target_price)}
                 </p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={async () => {
-                  await supabase
-                    .from("price_alerts")
-                    .update({ active: false })
-                    .eq("id", alert.id);
-                }}
-              >
-                Excluir
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(`/stations/${alert.station_id}`)}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deleteAlert.mutate(alert.id)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         ))}
