@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Filter, ArrowLeft, Navigation, MapPin, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,18 +9,25 @@ import { useLocation } from "@/contexts/LocationContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { Slider } from "@/components/ui/slider";
 import StationDetails from "@/components/stations/StationDetails";
-import { MyAlertsDialog } from "@/components/stations/MyAlertsDialog";
+import { useProfile } from "@/hooks/useProfile";
 
 const Stations = () => {
+  const { profile } = useProfile();
   const [selectedFuel, setSelectedFuel] = useState("regular");
   const [sortBy, setSortBy] = useState("distance");
-  const [maxDistance, setMaxDistance] = useState(10);
-  const [showMyAlerts, setShowMyAlerts] = useState(false);
+  const [maxDistance, setMaxDistance] = useState(profile?.search_radius || 10);
   const { id } = useParams();
   const navigate = useNavigate();
   const { location, isLoading: locationLoading, getCurrentLocation } = useLocation();
   
   const { data: stations, isLoading: stationsLoading } = useStations();
+
+  // Update maxDistance when profile loads
+  useEffect(() => {
+    if (profile?.search_radius) {
+      setMaxDistance(profile.search_radius);
+    }
+  }, [profile?.search_radius]);
 
   const processedStations = stations?.filter(station => {
     if (!location) return true;
@@ -74,7 +81,7 @@ const Stations = () => {
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => setShowMyAlerts(true)}
+          onClick={() => navigate("/price-alerts")}
         >
           <Bell className="w-4 h-4 mr-2" />
           Ver Meus Alertas
@@ -146,11 +153,6 @@ const Stations = () => {
           <div className="text-center py-4">Nenhum posto encontrado</div>
         )}
       </div>
-
-      <MyAlertsDialog
-        open={showMyAlerts}
-        onOpenChange={setShowMyAlerts}
-      />
     </div>
   );
 };

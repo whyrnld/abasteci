@@ -1,64 +1,32 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./contexts/AuthContext";
-import Index from "./pages/Index";
-import Scanner from "./pages/Scanner";
-import History from "./pages/History";
-import Stations from "./pages/Stations";
-import Settings from "./pages/Settings";
-import Balance from "./pages/Balance";
-import ReceiptDetails from "./pages/ReceiptDetails";
-import Premium from "./pages/Premium";
-import Referral from "./pages/Referral";
-import WithdrawalRequest from "./pages/WithdrawalRequest";
-import WithdrawalDetails from "./pages/WithdrawalDetails";
-import Notifications from "./pages/Notifications";
-import NotificationDetails from "./pages/NotificationDetails";
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import ResetPassword from "./pages/auth/ResetPassword";
-import ReferralStats from "./pages/ReferralStats";
-import PriceAlerts from "./pages/PriceAlerts";
+import { PrivateRoute } from "@/components/PrivateRoute";
+import { PublicRoute } from "@/components/PublicRoute";
 
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+import Home from "@/pages/Home";
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
+import Profile from "@/pages/Profile";
+import Settings from "@/pages/Settings";
+import Stations from "@/pages/Stations";
+import Receipts from "@/pages/Receipts";
+import Wallet from "@/pages/Wallet";
+import Referral from "@/pages/Referral";
+import ReferralStats from "@/pages/ReferralStats";
+import PriceAlerts from "@/pages/PriceAlerts";
 
-  if (loading) {
-    return <div>Carregando...</div>;
-  }
-
-  if (!user) {
-    // Salva a URL atual para redirecionar depois do login
-    const currentPath = window.location.pathname;
-    if (currentPath !== '/auth/login') {
-      sessionStorage.setItem('redirectAfterLogin', currentPath);
-    }
-    return <Navigate to="/auth/login" />;
-  }
-
-  return <>{children}</>;
-};
-
-const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <div>Carregando...</div>;
-  }
-
-  if (user) {
-    // Verifica se há uma URL salva para redirecionar
-    const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
-    sessionStorage.removeItem('redirectAfterLogin');
-    return <Navigate to={redirectUrl || "/"} />;
-  }
-
-  return <>{children}</>;
-};
-
-export const AppRoutes = () => (
+export const router = (
   <Routes>
-    {/* Public Routes */}
+    <Route
+      path="/"
+      element={
+        <PrivateRoute>
+          <Home />
+        </PrivateRoute>
+      }
+    />
+
     <Route
       path="/auth/login"
       element={
@@ -67,6 +35,7 @@ export const AppRoutes = () => (
         </PublicRoute>
       }
     />
+
     <Route
       path="/auth/register"
       element={
@@ -75,6 +44,7 @@ export const AppRoutes = () => (
         </PublicRoute>
       }
     />
+
     <Route
       path="/auth/forgot-password"
       element={
@@ -83,6 +53,7 @@ export const AppRoutes = () => (
         </PublicRoute>
       }
     />
+
     <Route
       path="/auth/reset-password"
       element={
@@ -92,47 +63,15 @@ export const AppRoutes = () => (
       }
     />
 
-    {/* Protected Routes */}
     <Route
-      path="/"
+      path="/profile"
       element={
         <PrivateRoute>
-          <Index />
+          <Profile />
         </PrivateRoute>
       }
     />
-    <Route
-      path="/scanner"
-      element={
-        <PrivateRoute>
-          <Scanner />
-        </PrivateRoute>
-      }
-    />
-    <Route
-      path="/history"
-      element={
-        <PrivateRoute>
-          <History />
-        </PrivateRoute>
-      }
-    />
-    <Route
-      path="/stations"
-      element={
-        <PrivateRoute>
-          <Stations />
-        </PrivateRoute>
-      }
-    />
-    <Route
-      path="/stations/:id"
-      element={
-        <PrivateRoute>
-          <Stations />
-        </PrivateRoute>
-      }
-    />
+
     <Route
       path="/settings"
       element={
@@ -141,30 +80,43 @@ export const AppRoutes = () => (
         </PrivateRoute>
       }
     />
+
     <Route
-      path="/balance"
+      path="/stations"
       element={
         <PrivateRoute>
-          <Balance />
+          <Stations />
         </PrivateRoute>
       }
     />
+
     <Route
-      path="/receipts/:id"
+      path="/stations/:id"
       element={
         <PrivateRoute>
-          <ReceiptDetails />
+          <Stations />
         </PrivateRoute>
       }
     />
+
     <Route
-      path="/premium"
+      path="/receipts"
       element={
         <PrivateRoute>
-          <Premium />
+          <Receipts />
         </PrivateRoute>
       }
     />
+
+    <Route
+      path="/wallet"
+      element={
+        <PrivateRoute>
+          <Wallet />
+        </PrivateRoute>
+      }
+    />
+
     <Route
       path="/referral"
       element={
@@ -173,38 +125,7 @@ export const AppRoutes = () => (
         </PrivateRoute>
       }
     />
-    <Route
-      path="/withdrawal-request"
-      element={
-        <PrivateRoute>
-          <WithdrawalRequest />
-        </PrivateRoute>
-      }
-    />
-    <Route
-      path="/withdrawals/:id"
-      element={
-        <PrivateRoute>
-          <WithdrawalDetails />
-        </PrivateRoute>
-      }
-    />
-    <Route
-      path="/notifications"
-      element={
-        <PrivateRoute>
-          <Notifications />
-        </PrivateRoute>
-      }
-    />
-    <Route
-      path="/notifications/:id"
-      element={
-        <PrivateRoute>
-          <NotificationDetails />
-        </PrivateRoute>
-      }
-    />
+
     <Route
       path="/referral-stats"
       element={
@@ -213,6 +134,7 @@ export const AppRoutes = () => (
         </PrivateRoute>
       }
     />
+
     <Route
       path="/price-alerts"
       element={
@@ -222,7 +144,6 @@ export const AppRoutes = () => (
       }
     />
 
-    {/* Catch all route - redirect to home */}
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
