@@ -9,7 +9,7 @@ const ReferralCard = () => {
   const { toast } = useToast();
   const { profile } = useProfile();
   const navigate = useNavigate();
-  const referralCode = profile?.referral_code || '';
+  const referralCode = profile?.referral_code;
 
   const handleShare = async () => {
     if (!referralCode) return;
