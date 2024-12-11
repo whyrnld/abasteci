@@ -16,7 +16,7 @@ import Referral from "@/pages/Referral";
 import ReferralStats from "@/pages/ReferralStats";
 import PriceAlerts from "@/pages/PriceAlerts";
 
-export const router = (
+export const AppRoutes = () => (
   <Routes>
     <Route
       path="/"
