@@ -13,7 +13,14 @@ const Receipts = () => {
       <h2 className="text-2xl font-bold">Minhas Notas Fiscais</h2>
       <div className="space-y-4">
         {receipts?.map((receipt) => (
-          <ReceiptCard key={receipt.id} receipt={receipt} />
+          <ReceiptCard 
+            key={receipt.id}
+            id={receipt.id}
+            station={receipt.stations.name}
+            amount={receipt.amount}
+            date={new Date(receipt.created_at).toLocaleDateString()}
+            status={receipt.status}
+          />
         ))}
         {receipts?.length === 0 && (
           <p className="text-center text-gray-500">
