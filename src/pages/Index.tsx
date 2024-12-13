@@ -14,19 +14,31 @@ import { StationCard } from "@/components/stations/StationCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MAX_DISTANCE = 5; // 5km maximum distance
 
+const LoadingState = () => (
+  <div className="space-y-6">
+    <div className="h-32 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg animate-pulse" />
+    <div className="space-y-4">
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+    </div>
+  </div>
+);
+
 const Index = () => {
   const { user } = useAuth();
-  const { profile } = useProfile();
+  const { profile, isLoading: isProfileLoading } = useProfile();
   const [selectedFuel, setSelectedFuel] = useState(profile?.preferred_fuel_type || 'regular');
   const { location } = useLocation();
-  const { data: stations, isLoading } = useStations();
+  const { data: stations, isLoading: isStationsLoading } = useStations();
   const navigate = useNavigate();
 
   // Fetch wallet balance
-  const { data: wallet } = useQuery({
+  const { data: wallet, isLoading: isWalletLoading } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
@@ -43,7 +55,7 @@ const Index = () => {
   });
 
   // Fetch pending receipts total
-  const { data: pendingTotal } = useQuery({
+  const { data: pendingTotal, isLoading: isPendingTotalLoading } = useQuery({
     queryKey: ['pending-receipts', user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
@@ -60,7 +72,7 @@ const Index = () => {
   });
 
   // Fetch unread notifications count
-  const { data: unreadCount = 0 } = useQuery({
+  const { data: unreadCount = 0, isLoading: isNotificationsLoading } = useQuery({
     queryKey: ['unread-notifications', user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
@@ -97,6 +109,16 @@ const Index = () => {
       })
       .slice(0, 5);
   }, [stations, selectedFuel]);
+
+  const isLoading = isProfileLoading || isWalletLoading || isPendingTotalLoading || isNotificationsLoading;
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6 pb-20 px-6 py-6">
+        <LoadingState />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 pb-20 px-6 py-6">
@@ -152,8 +174,12 @@ const Index = () => {
           </Button>
         </div>
 
-        {isLoading ? (
-          <div className="text-center py-4">Carregando postos...</div>
+        {isStationsLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
         ) : processedStations.length > 0 ? (
           <div className="flex flex-col py-4">
             {processedStations.map((station) => (
