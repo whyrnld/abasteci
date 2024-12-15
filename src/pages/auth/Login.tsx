@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { maskCPF } from "@/lib/utils";
 
 const Login = () => {
+  const [showLoginForm, setShowLoginForm] = useState(false);
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -133,13 +134,12 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div 
+      className="min-h-screen flex flex-col bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: 'url("/lovable-uploads/e1bf47e1-a5db-4e98-b28e-186214d302c4.png")' }}
+    >
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
         <div className="mx-auto w-full max-w-sm">
-          <div className="h-24 w-full flex items-center justify-center mb-8">
-            <img src="/abasteci.svg" alt="abasteci logo" />
-          </div>
-
           <div className="bg-white rounded-t-2xl p-6 shadow-sm">
             <Button
               onClick={() => navigate("/auth/register")}
@@ -151,72 +151,74 @@ const Login = () => {
             <Button
               variant="ghost"
               className="w-full text-primary"
-              onClick={() => navigate("/auth/login")}
+              onClick={() => setShowLoginForm(true)}
             >
               Acessar minha conta
             </Button>
           </div>
 
-          <form onSubmit={handleLogin} className="mt-8 space-y-6">
-            <div>
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                id="cpf"
-                type="text"
-                inputMode="numeric"
-                value={maskCPF(cpf)}
-                onChange={handleCPFChange}
-                placeholder="000.000.000-00"
-                required
-                className={`mt-2 ${cpfError ? 'border-red-500' : ''}`}
-              />
-              {cpfError && (
-                <p className="text-sm text-red-500 mt-1">{cpfError}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="password">Senha</Label>
-              <div className="relative mt-2">
+          {showLoginForm && (
+            <form onSubmit={handleLogin} className="mt-8 space-y-6 bg-white p-6 rounded-b-2xl shadow-sm">
+              <div>
+                <Label htmlFor="cpf">CPF</Label>
                 <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
+                  id="cpf"
+                  type="text"
                   inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Digite sua senha"
+                  value={maskCPF(cpf)}
+                  onChange={handleCPFChange}
+                  placeholder="000.000.000-00"
                   required
-                  maxLength={6}
-                  className="pr-10"
+                  className={`mt-2 ${cpfError ? 'border-red-500' : ''}`}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
+                {cpfError && (
+                  <p className="text-sm text-red-500 mt-1">{cpfError}</p>
+                )}
               </div>
-            </div>
 
-            <div className="text-right">
-              <Link
-                to="/auth/forgot-password"
-                className="text-sm font-medium text-primary hover:text-primary/80"
-              >
-                Esqueceu sua senha?
-              </Link>
-            </div>
+              <div>
+                <Label htmlFor="password">Senha</Label>
+                <div className="relative mt-2">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Digite sua senha"
+                    required
+                    maxLength={6}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
+              <div className="text-right">
+                <Link
+                  to="/auth/forgot-password"
+                  className="text-sm font-medium text-primary hover:text-primary/80"
+                >
+                  Esqueceu sua senha?
+                </Link>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     </div>
