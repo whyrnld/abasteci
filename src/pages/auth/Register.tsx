@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
 import { RegistrationSteps } from "@/components/auth/RegistrationSteps";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const Register = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const referralCode = searchParams.get("ref");
   const [referrerId, setReferrerId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
@@ -23,7 +26,6 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,12 +144,24 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      <div className="flex items-center p-4 border-b">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/auth")}
+          className="mr-2"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </Button>
+        <h1 className="text-xl font-semibold">Criar conta</h1>
+      </div>
+
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
         <RegistrationSteps
           formData={formData}
           handleChange={handleChange}
           currentStep={currentStep}
-          setCurrentStep={handleNextStep}
+          setCurrentStep={setCurrentStep}
           showPassword={showPassword}
           setShowPassword={setShowPassword}
           formatBirthDateForDisplay={formatBirthDateForDisplay}

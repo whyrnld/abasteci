@@ -13,6 +13,7 @@ import WithdrawalRequest from "./pages/WithdrawalRequest";
 import WithdrawalDetails from "./pages/WithdrawalDetails";
 import Notifications from "./pages/Notifications";
 import NotificationDetails from "./pages/NotificationDetails";
+import AuthIndex from "./pages/auth/Index";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -59,6 +60,14 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 export const AppRoutes = () => (
   <Routes>
     {/* Public Routes */}
+    <Route
+      path="/auth"
+      element={
+        <PublicRoute>
+          <AuthIndex />
+        </PublicRoute>
+      }
+    />
     <Route
       path="/auth/login"
       element={
