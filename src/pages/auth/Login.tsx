@@ -133,19 +133,29 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 px-6 py-6">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
         <div className="mx-auto w-full max-w-sm">
           <div className="h-24 w-full flex items-center justify-center mb-8">
-          <img 
-              src='/abasteci.svg' 
-              alt='abasteci logo'
-            />
+            <img src="/abasteci.svg" alt="abasteci logo" />
           </div>
 
-          <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Entre na sua conta
-          </h2>
+          <div className="bg-white rounded-t-2xl p-6 shadow-sm">
+            <Button
+              onClick={() => navigate("/auth/register")}
+              className="w-full bg-primary text-white mb-4"
+            >
+              Criar conta
+            </Button>
+            
+            <Button
+              variant="ghost"
+              className="w-full text-primary"
+              onClick={() => navigate("/auth/login")}
+            >
+              Acessar minha conta
+            </Button>
+          </div>
 
           <form onSubmit={handleLogin} className="mt-8 space-y-6">
             <div>
@@ -206,16 +216,6 @@ const Login = () => {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
             </Button>
-
-            <p className="text-center text-sm text-gray-500">
-              Não tem uma conta?{" "}
-              <Link
-                to="/auth/register"
-                className="font-medium text-primary hover:text-primary/80"
-              >
-                Criar conta
-              </Link>
-            </p>
           </form>
         </div>
       </div>
