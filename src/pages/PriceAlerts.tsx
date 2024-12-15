@@ -61,57 +61,63 @@ export default function PriceAlerts() {
   });
 
   return (
-    <div className="container py-6 space-y-6">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+    <div>
+      <div className="bg-emerald-400 text-white p-4 flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hover:bg-emerald-500/20"
+          onClick={() => navigate(-1)}
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <Bell className="w-5 h-5" />
-        <h1 className="text-xl font-medium">Meus Alertas de Preço</h1>
+        <h1 className="text-xl font-medium">Alertas de Preço</h1>
       </div>
 
-      <div className="space-y-4">
-        {alerts?.length === 0 && (
-          <p className="text-center text-gray-500 py-8">
-            Você não tem alertas de preço ativos.
-          </p>
-        )}
+      <div className="container py-6 space-y-6">
+        <div className="space-y-4">
+          {alerts?.length === 0 && (
+            <p className="text-center text-gray-500 py-8">
+              Você não tem alertas de preço ativos.
+            </p>
+          )}
 
-        {alerts?.map((alert) => (
-          <div
-            key={alert.id}
-            className="p-4 border rounded-lg space-y-2"
-          >
-            <h3 className="font-medium">{alert.stations.name}</h3>
-            <p className="text-sm text-gray-500">{alert.stations.address}</p>
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-sm font-medium capitalize">
-                  {alert.fuel_type}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Meta: {formatCurrency(alert.target_price)}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate(`/stations/${alert.station_id}`)}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteAlert.mutate(alert.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+          {alerts?.map((alert) => (
+            <div
+              key={alert.id}
+              className="p-4 border rounded-lg space-y-2"
+            >
+              <h3 className="font-medium">{alert.stations.name}</h3>
+              <p className="text-sm text-gray-500">{alert.stations.address}</p>
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-medium capitalize">
+                    {alert.fuel_type}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Meta: {formatCurrency(alert.target_price)}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(`/stations/${alert.station_id}`)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteAlert.mutate(alert.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

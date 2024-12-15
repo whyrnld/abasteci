@@ -24,7 +24,7 @@ const WithdrawalHistoryCard = ({ amount, date, status }: WithdrawalHistoryCardPr
   };
 
   return (
-    <div className="relative flex">
+    <div className="relative flex mb-4">
       <div className={cn(
         "absolute left-0 w-1 h-full rounded-l-lg",
         statusColors[status as keyof typeof statusColors] || "bg-gray-300"
