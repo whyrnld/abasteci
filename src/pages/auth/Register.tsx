@@ -53,6 +53,40 @@ const Register = () => {
     }));
   };
 
+  const canProceedToStep2 = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(formData.email);
+  };
+
+  const canProceedToStep3 = () => {
+    return (
+      formData.password.length === 6 &&
+      formData.confirmPassword === formData.password
+    );
+  };
+
+  const handleNextStep = () => {
+    if (currentStep === 1 && !canProceedToStep2()) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Por favor, insira um e-mail válido.",
+      });
+      return;
+    }
+
+    if (currentStep === 2 && !canProceedToStep3()) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "As senhas devem ter 6 dígitos e serem iguais.",
+      });
+      return;
+    }
+
+    setCurrentStep((prev) => prev + 1);
+  };
+
   const formatBirthDateForDisplay = (value: string) => {
     if (!value) return "";
     if (value.includes("-")) {
@@ -107,13 +141,13 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-white">
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
         <RegistrationSteps
           formData={formData}
           handleChange={handleChange}
           currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
+          setCurrentStep={handleNextStep}
           showPassword={showPassword}
           setShowPassword={setShowPassword}
           formatBirthDateForDisplay={formatBirthDateForDisplay}

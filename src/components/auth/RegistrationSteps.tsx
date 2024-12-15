@@ -87,6 +87,7 @@ export const RegistrationSteps = ({
       <Button 
         className="w-full" 
         onClick={() => setCurrentStep(2)}
+        disabled={!formData.email}
       >
         Continuar
       </Button>
@@ -150,6 +151,7 @@ export const RegistrationSteps = ({
       <Button 
         className="w-full" 
         onClick={() => setCurrentStep(3)}
+        disabled={!formData.password || !formData.confirmPassword}
       >
         Continuar
       </Button>
