@@ -25,10 +25,6 @@ const Login = () => {
       return false;
     }
 
-    // Validação do CPF
-    let sum = 0;
-    let remainder;
-
     if (
       cleanCPF === "00000000000" ||
       cleanCPF === "11111111111" ||
@@ -43,6 +39,9 @@ const Login = () => {
     ) {
       return false;
     }
+
+    let sum = 0;
+    let remainder;
 
     for (let i = 1; i <= 9; i++) {
       sum = sum + parseInt(cleanCPF.substring(i - 1, i)) * (11 - i);
@@ -138,8 +137,8 @@ const Login = () => {
       className="min-h-screen flex flex-col bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: 'url("/lovable-uploads/e1bf47e1-a5db-4e98-b28e-186214d302c4.png")' }}
     >
-      <div className="flex-1 flex flex-col justify-center px-6 py-12">
-        <div className="mx-auto w-full max-w-sm">
+      <div className="flex-1 flex flex-col justify-end px-6 py-12">
+        <div className="w-full max-w-none">
           <div className="bg-white rounded-t-2xl p-6 shadow-sm">
             <Button
               onClick={() => navigate("/auth/register")}

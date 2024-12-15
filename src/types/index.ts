@@ -13,3 +13,24 @@ export interface Profile {
   referral_code: string | null;
   referred_by: string | null;
 }
+
+export interface Station {
+  id: number;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  cnpj: string | null;
+  image_url: string | null;
+  brand_id: number | null;
+  created_at: string;
+}
+
+export interface Referral {
+  id: number;
+  referrer_id: string;
+  referred_id: string;
+  status: 'pending' | 'completed';
+  bonus_paid: boolean;
+  created_at: string;
+}
