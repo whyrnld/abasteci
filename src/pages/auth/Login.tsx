@@ -147,6 +147,10 @@ const Login = () => {
       </div>
 
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
+        <div className="mb-8 flex justify-center">
+          <img src="/logo.png" alt="Logo" className="h-12" />
+        </div>
+        
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <Label htmlFor="cpf">CPF</Label>

@@ -157,6 +157,10 @@ const Register = () => {
       </div>
 
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
+        <div className="mb-8 flex justify-center">
+          <img src="/logo.png" alt="Logo" className="h-12" />
+        </div>
+        
         <RegistrationSteps
           formData={formData}
           handleChange={handleChange}
