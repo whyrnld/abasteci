@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/lib/supabase";
-import { maskCPF, maskPhone } from "@/lib/utils";
+import { RegistrationSteps } from "@/components/auth/RegistrationSteps";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const Register = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const referralCode = searchParams.get("ref");
   const [referrerId, setReferrerId] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState(1);
   
   const [formData, setFormData] = useState({
     fullName: "",
@@ -20,44 +20,13 @@ const Register = () => {
     phone: "",
     birthDate: "",
     password: "",
+    confirmPassword: "",
     referralCode: referralCode || "",
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const { toast } = useToast();
-
-  useEffect(() => {
-    const validateReferralCode = async () => {
-      if (!formData.referralCode) return;
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("referral_code", formData.referralCode)
-        .single();
-      
-      if (error || !data) {
-        toast({
-          variant: "destructive",
-          title: "Código de indicação inválido",
-          description: "O código informado não existe.",
-        });
-        setReferrerId(null);
-        return;
-      }
-      
-      setReferrerId(data.id);
-      toast({
-        title: "Código de indicação válido!",
-        description: "Você receberá R$ 5,00 ao se cadastrar.",
-      });
-    };
-    
-    if (formData.referralCode) {
-      validateReferralCode();
-    }
-  }, [formData.referralCode, toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -84,6 +53,40 @@ const Register = () => {
       ...prev,
       [name]: processedValue,
     }));
+  };
+
+  const canProceedToStep2 = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(formData.email);
+  };
+
+  const canProceedToStep3 = () => {
+    return (
+      formData.password.length === 6 &&
+      formData.confirmPassword === formData.password
+    );
+  };
+
+  const handleNextStep = () => {
+    if (currentStep === 1 && !canProceedToStep2()) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Por favor, insira um e-mail válido.",
+      });
+      return;
+    }
+
+    if (currentStep === 2 && !canProceedToStep3()) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "As senhas devem ter 6 dígitos e serem iguais.",
+      });
+      return;
+    }
+
+    setCurrentStep((prev) => prev + 1);
   };
 
   const formatBirthDateForDisplay = (value: string) => {
@@ -140,150 +143,35 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 px-6 py-6">
+    <div className="min-h-screen flex flex-col bg-white">
+      <div className="flex items-center p-4 border-b">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/auth")}
+          className="mr-2"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </Button>
+        <h1 className="text-xl font-semibold">Criar conta</h1>
+      </div>
+
       <div className="flex-1 flex flex-col justify-center px-6 py-12">
-        <div className="mx-auto w-full max-w-sm">
-          <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Criar nova conta
-          </h2>
-          
-          {referralCode && referrerId && (
-            <div className="mt-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm text-center">
-              Você foi indicado e receberá R$ 5,00 ao se cadastrar!
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            <div>
-              <Label htmlFor="fullName">Nome completo</Label>
-              <Input
-                id="fullName"
-                name="fullName"
-                type="text"
-                required
-                value={formData.fullName}
-                onChange={handleChange}
-                className="mt-2"
-                placeholder="Digite seu nome completo"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="email">E-mail</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-2"
-                placeholder="Digite seu e-mail"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                id="cpf"
-                name="cpf"
-                type="text"
-                required
-                maxLength={11}
-                value={maskCPF(formData.cpf)}
-                onChange={handleChange}
-                className="mt-2"
-                placeholder="000.000.000-00"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="phone">Telefone</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="text"
-                required
-                maxLength={11}
-                value={maskPhone(formData.phone)}
-                onChange={handleChange}
-                className="mt-2"
-                placeholder="(00) 00000-0000"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="birthDate">Data de nascimento</Label>
-              <Input
-                id="birthDate"
-                name="birthDate"
-                type="text"
-                required
-                value={formatBirthDateForDisplay(formData.birthDate)}
-                onChange={handleChange}
-                className="mt-2"
-                placeholder="DD/MM/AAAA"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="referralCode">Código de indicação (opcional)</Label>
-              <Input
-                id="referralCode"
-                name="referralCode"
-                type="text"
-                value={formData.referralCode}
-                onChange={handleChange}
-                className="mt-2"
-                placeholder="Digite o código de indicação"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="password">Senha (6 números)</Label>
-              <div className="relative mt-2">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  pattern="[0-9]{6}"
-                  title="A senha deve conter 6 números"
-                  maxLength={6}
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="pr-10"
-                  placeholder="Digite sua senha"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Criando conta..." : "Criar conta"}
-            </Button>
-
-            <p className="text-center text-sm text-gray-500">
-              Já tem uma conta?{" "}
-              <Link
-                to="/auth/login"
-                className="font-medium text-primary hover:text-primary/80"
-              >
-                Fazer login
-              </Link>
-            </p>
-          </form>
+        <div className="mb-8 flex justify-center">
+          <img src="/logo.png" alt="Logo" className="h-12" />
         </div>
+        
+        <RegistrationSteps
+          formData={formData}
+          handleChange={handleChange}
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+          formatBirthDateForDisplay={formatBirthDateForDisplay}
+          loading={loading}
+          handleSubmit={handleSubmit}
+        />
       </div>
     </div>
   );
