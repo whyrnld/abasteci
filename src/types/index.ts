@@ -24,6 +24,15 @@ export interface Station {
   image_url: string | null;
   brand_id: number | null;
   created_at: string;
+  phone?: string;
+  prices?: {
+    regular: number;
+    premium: number;
+    ethanol: number;
+    diesel: number;
+    updated_at: string;
+  };
+  calculatedDistance?: number;
 }
 
 export interface Referral {
@@ -33,4 +42,5 @@ export interface Referral {
   status: 'pending' | 'completed';
   bonus_paid: boolean;
   created_at: string;
+  referred?: Profile;
 }
