@@ -29,12 +29,12 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    // Salva a URL atual para redirecionar depois do login
+    // Save current URL for redirect after login, but only if it's not an auth route
     const currentPath = window.location.pathname;
-    if (currentPath !== '/auth/login') {
+    if (!currentPath.startsWith('/auth')) {
       sessionStorage.setItem('redirectAfterLogin', currentPath);
     }
-    return <Navigate to="/auth/login" />;
+    return <Navigate to="/auth" />;
   }
 
   return <>{children}</>;
@@ -48,7 +48,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (user) {
-    // Verifica se há uma URL salva para redirecionar
+    // Check for saved redirect URL
     const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
     sessionStorage.removeItem('redirectAfterLogin');
     return <Navigate to={redirectUrl || "/"} />;
@@ -231,7 +231,7 @@ export const AppRoutes = () => (
       }
     />
 
-    {/* Catch all route - redirect to home */}
-    <Route path="*" element={<Navigate to="/" replace />} />
+    {/* Catch all route - redirect to auth for unauthenticated users */}
+    <Route path="*" element={<Navigate to="/auth" replace />} />
   </Routes>
 );
