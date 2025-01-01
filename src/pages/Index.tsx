@@ -14,17 +14,22 @@ import { StationCard } from "@/components/stations/StationCard";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import { Skeleton } from "@/components/ui/skeleton";
+import { BalanceCardSkeleton } from "@/components/skeletons/BalanceCardSkeleton";
+import { PremiumCardSkeleton } from "@/components/skeletons/PremiumCardSkeleton";
+import { ReferralCardSkeleton } from "@/components/skeletons/ReferralCardSkeleton";
+import { StationCardSkeleton } from "@/components/skeletons/StationCardSkeleton";
 
-const MAX_DISTANCE = 5; // 5km maximum distance
+const MAX_DISTANCE = 5;
 
 const LoadingState = () => (
   <div className="space-y-6">
-    <div className="h-32 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg animate-pulse" />
+    <BalanceCardSkeleton />
     <div className="space-y-4">
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
+      <PremiumCardSkeleton />
+      <ReferralCardSkeleton />
+      <StationCardSkeleton />
+      <StationCardSkeleton />
+      <StationCardSkeleton />
     </div>
   </div>
 );
@@ -37,7 +42,6 @@ const Index = () => {
   const { data: stations, isLoading: isStationsLoading } = useStations();
   const navigate = useNavigate();
 
-  // Fetch wallet balance
   const { data: wallet, isLoading: isWalletLoading } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
@@ -54,7 +58,6 @@ const Index = () => {
     enabled: !!user?.id,
   });
 
-  // Fetch pending receipts total
   const { data: pendingTotal, isLoading: isPendingTotalLoading } = useQuery({
     queryKey: ['pending-receipts', user?.id],
     queryFn: async () => {
@@ -71,7 +74,6 @@ const Index = () => {
     enabled: !!user?.id,
   });
 
-  // Fetch unread notifications count
   const { data: unreadCount = 0, isLoading: isNotificationsLoading } = useQuery({
     queryKey: ['unread-notifications', user?.id],
     queryFn: async () => {
@@ -89,7 +91,6 @@ const Index = () => {
     enabled: !!user?.id,
   });
 
-  // Process and sort stations
   const processedStations = useMemo(() => {
     if (!stations) return [];
     
@@ -176,9 +177,9 @@ const Index = () => {
 
         {isStationsLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
+            <StationCardSkeleton />
+            <StationCardSkeleton />
+            <StationCardSkeleton />
           </div>
         ) : processedStations.length > 0 ? (
           <div className="flex flex-col py-4">
