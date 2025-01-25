@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -25,7 +25,7 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
- 
+
   * {
     @apply border-border;
   }
@@ -44,7 +44,19 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  select, .select, [data-radix-select-content] {
+  select,
+  .select,
+  [data-radix-select-content] {
     @apply bg-white;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }

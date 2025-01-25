@@ -2,9 +2,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReceiptCard from "@/components/ReceiptCard";
 import { useReceipts } from "@/hooks/useReceipts";
 import { format } from "date-fns";
+import { useRef } from "react";
 
 const History = () => {
   const { receipts, isLoading } = useReceipts();
+  const tabsListRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
+    if (tabsListRef.current) {
+      event.preventDefault();
+      tabsListRef.current.scrollLeft += event.deltaY;
+    }
+  };
 
   if (isLoading) {
     return (
@@ -24,14 +33,40 @@ const History = () => {
       </section>
 
       <Tabs defaultValue="all" className="w-full mt-4">
-        <TabsList className="w-full grid grid-cols-4 h-auto p-1 bg-gray-100">
-          <TabsTrigger value="all" className="text-sm py-2">Todos</TabsTrigger>
-          <TabsTrigger value="approved" className="text-sm py-2">Aprovados</TabsTrigger>
-          <TabsTrigger value="processing" className="text-sm py-2">Em análise</TabsTrigger>
-          <TabsTrigger value="rejected" className="text-sm py-2">Recusados</TabsTrigger>
-        </TabsList>
+        <div className="relative">
+          <TabsList
+            ref={tabsListRef}
+            onWheel={handleScroll}
+            className="w-full h-auto p-1 flex overflow-x-auto scrollbar-none gap-2 border rounded-full"
+          >
+            <TabsTrigger
+              value="all"
+              className="flex-none px-4 py-2 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Todos
+            </TabsTrigger>
+            <TabsTrigger
+              value="approved"
+              className="flex-none px-4 py-2 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Aprovados
+            </TabsTrigger>
+            <TabsTrigger
+              value="processing"
+              className="flex-none px-4 py-2 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Em análise
+            </TabsTrigger>
+            <TabsTrigger
+              value="rejected"
+              className="flex-none px-4 py-2 rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              Recusados
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="all" className="mt-6">
+        <TabsContent value="all" className="my-6">
           {receipts?.map((receipt) => (
             <ReceiptCard
               key={receipt.id}
